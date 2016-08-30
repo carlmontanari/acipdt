@@ -187,7 +187,6 @@ class FabPodPol(object):
                                 "tDn": "uni/tn-mgmt/mgmtp-default/oob-default",
                                 "status": "created,modified"
                             },
-                            "children": []
                         }
                     }
                 ]
@@ -1723,35 +1722,19 @@ class FabTnPol(object):
         else:
             try:
                 dst_start = int(dst_start)
-            except:
-                print("Filter dest port (start) not 'unspecified' or valid "
-                      "integer. Changing filter source to '53'. "
-                      "Please update workbook.")
-                dst_start = 53
-            try:
                 dst_end = int(dst_end)
             except:
-                print("Filter dest port (end) not 'unspecified' or valid "
-                      "integer. Changing filter source to '53'. "
-                      "Please update workbook.")
-                dst_end = 53
+                status = 667
+                return status
         if src_start and src_end == 'unspecified':
             pass
         else:
             try:
                 src_start = int(src_start)
-            except:
-                print("Filter source port (start) not 'unspecified' or valid "
-                      "integer. Changing filter source to '53'. "
-                      "Please update workbook.")
-                src_start = 53
-            try:
                 src_end = int(src_end)
             except:
-                print("Filter source port (end) not 'unspecified' or valid "
-                      "integer. Changing filter source to '53'. "
-                      "Please update workbook.")
-                src_end = 53
+                status = 667
+                return status
         payload = {
             'vzFilter': {
                 'attributes': {
@@ -1970,7 +1953,8 @@ class FabTnPol(object):
                     "dn": "uni/tn-%s/ap-%s/epg-%s/rsdomAtt-[uni/vmmp-VMware/dom-%s]" % (tn_name, ap_name, epg_name, vmm_dom),
                     "instrImedcy": "%s" % deploy,
                     "resImedcy": "%s" % resolve,
-                    "status": "%s" % status
+                    "status": "%s" % status,
+                    "tDn": "uni/vmmp-VMware/dom-%s" % (vmm_dom)
                 },
                 "children": [
                     {
@@ -1989,8 +1973,8 @@ class FabTnPol(object):
         }
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/ap-%s/epg-%s/rsdomAtt-[uni/phys-%s].json'
-                       % (self.apic, tn_name, ap_name, epg_name, vmm_dom),
+            r = s.post('https://%s/api/node/mo/uni/tn-%s/ap-%s/epg-%s.json'
+                       % (self.apic, tn_name, ap_name, epg_name),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
@@ -2009,7 +1993,6 @@ class FabTnPol(object):
         payload = {
             "fvRsProv": {
                 "attributes": {
-                    "childAction": "",
                     "dn": "uni/tn-%s/ap-%s/epg-%s/rsprov-%s" % (tn_name, ap_name, epg_name, contract),
                     "prio": "unspecified",
                     "status": "%s" % status,
@@ -2038,8 +2021,7 @@ class FabTnPol(object):
         payload = {
             "fvRsCons": {
                 "attributes": {
-                    "childAction": "",
-                    "dn": "uni/tn-%s/ap-%s/epg-%s/rsprov-%s" % (tn_name, ap_name, epg_name, contract),
+                    "dn": "uni/tn-%s/ap-%s/epg-%s/rscons-%s" % (tn_name, ap_name, epg_name, contract),
                     "prio": "unspecified",
                     "status": "%s" % status,
                     "tnVzBrCPName": "%s" % contract
@@ -2776,12 +2758,12 @@ class FabL3Pol(object):
     def deploy_int_pol(self, tn_name, name, node_name, int_profile, pol_type,
                        pol_name, status):
         payload = {
-            "ospfIfP": {
+            "%sIfP" % (pol_type): {
                 "attributes": {
                     "authKeyId": "1",
                     "authType": "none",
                     "dn": "uni/tn-%s/out-%s/lnodep-%s/lifp-%s/%sIfP" % (tn_name, name, node_name, int_profile, pol_type),
-                    "status": "created,modified"
+                    "status": "%s" % (status)
                 },
                 "children": [
                     {
@@ -2798,8 +2780,8 @@ class FabL3Pol(object):
         }
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/%sIfPol-%s.json'
-                       % (self.apic, tn_name, pol_type, pol_name),
+            r = s.post('https://%s/api/node/mo/uni/tn-%s/out-%s/lnodep-%s/lifp-%s.json'
+                       % (self.apic, tn_name, name, node_name, int_profile),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
