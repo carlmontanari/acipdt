@@ -2146,6 +2146,79 @@ class FabTnPol(object):
             status = 666
         return status
 
+    # Method must be called with the following data.
+    # NOTE: At this time this only supports external DHCP servers (external to the fabric)
+    # tn_name: The name of the Tenant
+    # relay_name: Name of the DHCP Label/Provider
+    # dhcp_ip: IP of the DHCP server
+    # l3_tn: Name of the Tenant containing the L3 out used to reach DHCP server
+    # l3_out: Name of the L3 out used to reach DHCP server
+    # l3_network: Name of the L3 out Network used to reach DHCP server
+    # status: created | created,modified | deleted
+    def dhcp_relay(self, tn_name, relay_name, dhcp_ip, l3_tn, l3_out, l3_network, status):
+        payload = {
+            "dhcpRelayP": {
+                "attributes": {
+                    "dn": "uni/tn-%s/relayp-%s" % (tn_name, relay_name),
+                    "name": "%s" % relay_name,
+                    "status": "%s" % status
+                },
+                "children": [
+                    {
+                        "dhcpRsProv": {
+                            "attributes": {
+                                "addr": "%s" % dhcp_ip,
+                                "rn": "rsprov-[uni/tn-%s/out-%s/instP-%s]" % (l3_tn, l3_out, l3_network),
+                                "status": "%s" % status
+                            },
+                        }
+                    },
+                ]
+            }
+        }
+        s = requests.Session()
+        try:
+            r = s.post('https://%s/api/node/mo/uni/tn-%s/relayp-%s.json'
+                       % (self.apic, tn_name, relay_name),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
+            status = r.status_code
+        except Exception, e:
+            print("DHCP Relay failed to deploy. Exception: "
+                  "%s" % e)
+            status = 666
+        return status
+
+    # Method must be called with the following data.
+    # tn_name: The name of the Tenant
+    # bd_name: Name of BD to deploy DHCP label to
+    # relay_name: Name of the DHCP Label/Provider
+    # status: created | created,modified | deleted
+    # scope (optional): infra | tenant, defaults to tenant
+    def dhcp_label(self, tn_name, bd_name, relay_name, scope, status):
+        payload = {
+            "dhcpLbl": {
+                "attributes": {
+                    "dn": "uni/tn-%s/BD-%s/dhcplbl-%s" % (tn_name, bd_name, relay_name),
+                    "name": "%s" % relay_name,
+                    "owner": "%s" % scope,
+                    "status": "%s" % status
+                }
+            }
+        }
+        s = requests.Session()
+        try:
+            r = s.post('https://%s/api/node/mo/uni/tn-%s/BD-%s.json'
+                       % (self.apic, tn_name, bd_name),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
+            status = r.status_code
+        except Exception, e:
+            print("DHCP Label failed to deploy. Exception: "
+                  "%s" % e)
+            status = 666
+        return status
+
 
 # Class must be instantiated with APIC IP address and cookies
 class FabL3Pol(object):
