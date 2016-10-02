@@ -83,7 +83,7 @@ class FabLogin(object):
                 print("Seems like you're trying to POST to a page that doesn't"
                       " exist.")
                 sys.exit()
-        except Exception, e:
+        except Exception as e:
             print("Something went wrong logging into the APIC - ABORT!")
             # Log exit reason somewhere
             sys.exit(e)
@@ -163,7 +163,7 @@ class FabPodPol(object):
                        % (self.apic), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Hadrware Failed to provision. Exception: %s" % e)
             status = 666
         return status
@@ -198,7 +198,7 @@ class FabPodPol(object):
                        % (self.apic), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("NTP Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -256,7 +256,7 @@ class FabPodPol(object):
                        % (self.apic), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("DNS Server Failed to deploy. Exception: %s" % e)
             status = 666
         payload = {
@@ -272,7 +272,7 @@ class FabPodPol(object):
             r = s.post('https://%s/api/node/mo/uni/fabric/dnsp-default/rsProfileToEpg.json'
                        % (self.apic), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
-        except Exception, e:
+        except Exception as e:
             print("DNS to OOB EPG Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -302,7 +302,7 @@ class FabPodPol(object):
                        % (self.apic), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Fabric BGP Policy Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -332,7 +332,7 @@ class FabPodPol(object):
                        % (self.apic, rr), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Fabric Route Reflector Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -404,7 +404,7 @@ class FabPodPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Fabric Pod Policy Failed to deploy. Exception: %s" % e)
             status = 666
         payload = {
@@ -421,7 +421,7 @@ class FabPodPol(object):
                        % (self.apic), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Assigning Pod Policy Failed. Exception: %s" % e)
             status = 666
         return status
@@ -455,7 +455,7 @@ class FabAccPol(object):
                        (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("CDP Policy Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -484,7 +484,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("LLDP Policy Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -513,7 +513,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Link Policy Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -544,7 +544,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Port Channel Policy Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -570,7 +570,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Per Port VLAN Policy Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -596,7 +596,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("MCP Interface Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -620,7 +620,7 @@ class FabAccPol(object):
                        % self.apic, data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("MCP Global Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -643,7 +643,7 @@ class FabAccPol(object):
                        % (self.apic, event), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Error Disable Policy Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -690,7 +690,7 @@ class FabAccPol(object):
                        % (self.apic, name, mode), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("VLAN Pool Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -874,7 +874,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("AEP Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -910,7 +910,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Domain Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -946,7 +946,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Physical Domain Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -982,7 +982,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Domain to AEP Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -1018,7 +1018,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Physical Domain to AEP Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -1084,7 +1084,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("vPC Policy Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -1157,7 +1157,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Switch Profile (vPC) Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -1214,7 +1214,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Switch Profile (single switch) Failed to deploy. "
                   "Exception: %s" % e)
             status = 666
@@ -1326,7 +1326,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Interface Policy Group (vPC) Failed to deploy. "
                   "Exception: %s" % e)
             status = 666
@@ -1427,7 +1427,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Interface Policy Group (Access) Failed to deploy. "
                   "Exception: %s" % e)
             status = 666
@@ -1452,7 +1452,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Interface Profile Failed to deploy. "
                   "Exception: %s" % e)
             status = 666
@@ -1521,7 +1521,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Interface Selector Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -1563,7 +1563,7 @@ class FabAccPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Switch Profile Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -1594,7 +1594,7 @@ class FabTnPol(object):
                        % (self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Tenant Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -1622,7 +1622,7 @@ class FabTnPol(object):
                        % (self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("VRF Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -1699,7 +1699,7 @@ class FabTnPol(object):
                        % (self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("BD Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -1773,10 +1773,10 @@ class FabTnPol(object):
                        % (self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Filter Policy Failed to deploy. "
                   "Check your payload and URL.")
-        except Exception, e:
+        except Exception as e:
             print("Filter Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -1834,7 +1834,7 @@ class FabTnPol(object):
                        % (self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Contract Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -1859,7 +1859,7 @@ class FabTnPol(object):
                        % (self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("App Profile failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -1898,7 +1898,7 @@ class FabTnPol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("EPG failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -1931,7 +1931,7 @@ class FabTnPol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("EPG to Phys Dom failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -1978,7 +1978,7 @@ class FabTnPol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("EPG to VMM Dom failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -2006,7 +2006,7 @@ class FabTnPol(object):
                        % (self.apic, tn_name, ap_name, epg_name, contract), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Provide Contract failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -2035,7 +2035,7 @@ class FabTnPol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Consume Contract failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -2088,7 +2088,7 @@ class FabTnPol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Static path binding (vPC) failed to deploy. Exception: %s"
                   % e)
             status = 666
@@ -2140,7 +2140,7 @@ class FabTnPol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("Static path binding (access) failed to deploy. Exception: "
                   "%s" % e)
             status = 666
@@ -2183,7 +2183,7 @@ class FabTnPol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("DHCP Relay failed to deploy. Exception: "
                   "%s" % e)
             status = 666
@@ -2213,7 +2213,7 @@ class FabTnPol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("DHCP Label failed to deploy. Exception: "
                   "%s" % e)
             status = 666
@@ -2269,7 +2269,7 @@ class FabL3Pol(object):
                        % (self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Out (initial setup) Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -2312,7 +2312,7 @@ class FabL3Pol(object):
                        % (self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Out (OSPF) Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -2348,7 +2348,7 @@ class FabL3Pol(object):
                        % (self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Out (BGP) Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -2432,7 +2432,7 @@ class FabL3Pol(object):
                        % (self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Out (Node Profile) Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -2490,7 +2490,7 @@ class FabL3Pol(object):
                        % (self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Out (Static Route) Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -2553,7 +2553,7 @@ class FabL3Pol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Out (Routed Ints) Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -2618,7 +2618,7 @@ class FabL3Pol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Out (Routed Ints) Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -2709,7 +2709,7 @@ class FabL3Pol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Out (SVIs) Failed to deploy. Exception: %s" % e)
             status = 666
         return status
@@ -2770,7 +2770,7 @@ class FabL3Pol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Out (Prefix Based EPG) Failed to deploy. Exception: %s"
                   % e)
             status = 666
@@ -2814,7 +2814,7 @@ class FabL3Pol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Out (OSPF Interface Policy) Failed to deploy. "
                   "Exception: %s" % e)
             status = 666
@@ -2858,7 +2858,7 @@ class FabL3Pol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Out (Deploy Interface Policy) Failed to deploy. "
                   "Exception: %s" % e)
             status = 666
@@ -2940,7 +2940,7 @@ class FabL3Pol(object):
                        % (self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Out (BGP Peer - Loopback) Failed to deploy. "
                   "Exception: %s" % e)
             status = 666
@@ -3038,7 +3038,7 @@ class FabL3Pol(object):
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
-        except Exception, e:
+        except Exception as e:
             print("L3 Out (BGP Peer - SVI) Failed to deploy. "
                   "Exception: %s" % e)
             status = 666
