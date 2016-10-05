@@ -3043,3 +3043,125 @@ class FabL3Pol(object):
                   "Exception: %s" % e)
             status = 666
         return status
+
+
+# Class must be instantiated with APIC IP address and cookies
+class TshootPol(object):
+    def __init__(self, apic, cookies):
+        self.apic = apic
+        self.cookies = cookies
+
+    # Method must be called with the following data.
+    # tn_name: Name of the Tenant (for source of SPAN)
+    # name: The name of the SPAN Source (automatically append -Group where appropriate)
+    # admin: enabled | disabled
+    # direction: both | in | out
+    # ap: Name of Application Profile (for source of SPAN)
+    # epg: Name of EPG (for source of SPAN)
+    # dest: Name of SPAN Destination, -Group is automatically appended
+    # status: created | created,modified | deleted
+    def span_src(self, tn_name, name, admin, direction, ap, epg, dest, status):
+        payload = {
+            "spanSrcGrp": {
+                "attributes": {
+                    "adminSt": "%s" % admin,
+                    "dn": "uni/tn-%s/srcgrp-%s-Group" % (tn_name, name),
+                    "name": "%s-Group" % name,
+                    "status": "%s" % status
+                },
+                "children": [
+                    {
+                        "spanSrc": {
+                            "attributes": {
+                                "dir": "%s" % direction,
+                                "name": "%s" % name
+                            },
+                            "children": [
+                                {
+                                    "spanRsSrcToEpg": {
+                                        "attributes": {
+                                            "tDn": "uni/tn-%s/ap-%s/epg-%s" % (tn_name, ap, epg)
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "spanSpanLbl": {
+                            "attributes": {
+                                "name": "%s-Group" % dest,
+                                "tag": "yellow-green"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+        s = requests.Session()
+        try:
+            r = s.post('https://%s/api/node/mo/uni/tn-%s/srcgrp-%s-Group.json'
+                       % (self.apic, tn_name, name), data=json.dumps(payload),
+                       cookies=self.cookies, verify=False)
+            status = r.status_code
+        except Exception as e:
+            print("SPAN Source Group Failed to deploy. Exception: %s" % e)
+            status = 666
+        return status
+
+    # Method must be called with the following data.
+    # tn_name: Name of the Tenant (where you are building the SPAN)
+    # name: The name of the SPAN Destination Group
+    # tn_dest: Name of the Tenant where the SPAN destination resides
+    # ap: Name of Application Profile (for destination of SPAN)
+    # epg: Name of EPG (for destination of SPAN)
+    # dest_ip: IP address of device terminating SPAN
+    # src_ip: IP address of ACI ERSPAN source
+    # status: created | created,modified | deleted
+    def span_dst(self, tn_name, name, tn_dest, ap, epg, dest_ip, src_ip, status):
+        payload = {
+            "spanDestGrp": {
+                "attributes": {
+                    "dn": "uni/tn-%s/destgrp-%s-Group" % (tn_name, name),
+                    "name": "%s-Group" % name,
+                    "status": "%s" % status
+                },
+                "children": [
+                    {
+                        "spanDest": {
+                            "attributes": {
+                                "name": "%s" % name
+                            },
+                            "children": [
+                                {
+                                    "spanRsDestEpg": {
+                                        "attributes": {
+                                            "dscp": "unspecified",
+                                            "finalIp": "0.0.0.0",
+                                            "flowId": "1",
+                                            "ip": "%s" % dest_ip,
+                                            "mtu": "1518",
+                                            "srcIpPrefix": "%s" % src_ip,
+                                            "tDn": "uni/tn-%s/ap-%s/epg-%s" % (tn_dest, ap, epg),
+                                            "ttl": "64",
+                                            "ver": "ver2",
+                                            "verEnforced": "no"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+        s = requests.Session()
+        try:
+            r = s.post('https://%s/api/node/mo/uni/tn-%s/destgrp-%s-Group.json'
+                       % (self.apic, tn_name, name), data=json.dumps(payload),
+                       cookies=self.cookies, verify=False)
+            status = r.status_code
+        except Exception as e:
+            print("SPAN Destination Group Failed to deploy. Exception: %s" % e)
+            status = 666
+        return status
