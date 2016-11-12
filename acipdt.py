@@ -3165,3 +3165,25 @@ class TshootPol(object):
             print("SPAN Destination Group Failed to deploy. Exception: %s" % e)
             status = 666
         return status
+
+
+# Class must be instantiated with APIC IP address and cookies
+class Query(object):
+    def __init__(self, apic, cookies):
+        self.apic = apic
+        self.cookies = cookies
+
+    # Method must be called with the following data.
+    # dn: DN of object you would like to query
+    # Returns status code and json payload of query
+    def query_dn(self, dn):
+        s = requests.Session()
+        try:
+            r = s.get('https://%s/api/node/mo/%s.json'
+                      % (self.apic, dn), cookies=self.cookies, verify=False)
+            status = r.status_code
+            payload = json.loads(r.text)
+        except Exception as e:
+            print("Failed to query DN. Exception: %s" % e)
+            status = 666
+        return (status, payload)
