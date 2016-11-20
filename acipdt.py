@@ -1,6 +1,7 @@
 import requests
 import json
 import sys
+import collections
 
 
 '''
@@ -47,19 +48,23 @@ class FabLogin(object):
 
     def login(self):
         # Load login json payload
-        payload = {
-            'aaaUser': {
-                'attributes': {
-                    'name': self.user,
-                    'pwd': self.pword
-                }
-            }
-        }
+        payload = '''
+        {{
+            "aaaUser": {{
+                "attributes": {{
+                    "name": "{user}",
+                    "pwd": "{pword}"
+                }}
+            }}
+        }}
+        '''.format(user=self.user, pword=self.pword)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         # Try the request, if exception, exit program w/ error
         try:
             # Verify is disabled as there are issues if it is enabled
-            r = s.post('https://%s/api/mo/aaaLogin.json' % self.apic,
+            r = s.post('https://{}/api/mo/aaaLogin.json'.format(self.apic),
                        data=json.dumps(payload), verify=False)
             # Capture HTTP status code from the request
             status = r.status_code
@@ -115,56 +120,61 @@ class FabPodPol(object):
         except:
             status = 667
             return status
-        payload = {
-            "polUni": {
-                "attributes": {
+        payload = '''
+        {{
+            "polUni": {{
+                "attributes": {{
                     "dn": "uni"
-                },
+                }},
                 "children": [
-                    {
-                        "ctrlrInst": {
-                            "attributes": {
+                    {{
+                        "ctrlrInst": {{
+                            "attributes": {{
                                 "ownerKey": "",
                                 "ownerTag": ""
-                            },
+                            }},
                             "children": [
-                                {
-                                    "fabricNodeIdentPol": {
-                                        "attributes": {
+                                {{
+                                    "fabricNodeIdentPol": {{
+                                        "attributes": {{
                                             "name": "default",
                                             "ownerKey": "",
                                             "ownerTag": ""
-                                        },
+                                        }},
                                         "children": [
-                                            {
-                                                "fabricNodeIdentP": {
-                                                    "attributes": {
-                                                        "name": "%s" % name,
-                                                        "nodeId": "%s" % id,
-                                                        "serial": "%s" % serial,
-                                                        "descr": "%s" % descr,
-                                                        "fabricId": "%s" % fabric,
-                                                        "podId": "%s" % pod
-                                                    }
-                                                }
-                                            },
+                                            {{
+                                                "fabricNodeIdentP": {{
+                                                    "attributes": {{
+                                                        "name": "{name}",
+                                                        "nodeId": "{id}",
+                                                        "serial": "{serial}",
+                                                        "descr": "{descr}",
+                                                        "fabricId": "{fabric}",
+                                                        "podId": "{pod}"
+                                                    }}
+                                                }}
+                                            }}
                                         ]
-                                    }
-                                }
+                                    }}
+                                }}
                             ]
-                        }
-                    }
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(name=name, id=id, serial=serial, descr=descr, fabric=fabric,
+                   pod=pod)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni.json'
-                       % (self.apic), data=json.dumps(payload),
-                       cookies=self.cookies, verify=False)
+            r = s.post('https://{}/api/node/mo/uni.json'.format(self.apic),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
             status = r.status_code
         except Exception as e:
-            print("Hadrware Failed to provision. Exception: %s" % e)
+            print("Hadrware Failed to provision. Exception: {}".format(e))
             status = 666
         return status
 
@@ -172,34 +182,38 @@ class FabPodPol(object):
     # address: Name/IP of the NTP server
     # status: created | created,modified | deleted
     def ntp(self, address, status):
-        payload = {
-            "datetimeNtpProv": {
-                "attributes": {
-                    "dn": "uni/fabric/time-default/ntpprov-%s" % address,
-                    "name": "%s" % address,
-                    "rn": "ntpprov-%s" % address,
-                    "status": "%s" % status
-                },
+        payload = '''
+        {{
+            "datetimeNtpProv": {{
+                "attributes": {{
+                    "dn": "uni/fabric/time-default/ntpprov-{address}",
+                    "name": "{address}",
+                    "rn": "ntpprov-{address}",
+                    "status": "{status}"
+                }},
                 "children": [
-                    {
-                        "datetimeRsNtpProvToEpg": {
-                            "attributes": {
+                    {{
+                        "datetimeRsNtpProvToEpg": {{
+                            "attributes": {{
                                 "tDn": "uni/tn-mgmt/mgmtp-default/oob-default",
                                 "status": "created,modified"
-                            },
-                        }
-                    }
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(address=address, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni.json'
-                       % (self.apic), data=json.dumps(payload),
-                       cookies=self.cookies, verify=False)
+            r = s.post('https://{}/api/node/mo/uni.json'.format(self.apic),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
             status = r.status_code
         except Exception as e:
-            print("NTP Failed to deploy. Exception: %s" % e)
+            print("NTP Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -219,61 +233,72 @@ class FabPodPol(object):
             preferred = 'no'
         if domain_default == '':
             domain_default = 'no'
-        payload = {
-            "dnsProfile": {
-                "attributes": {
+        payload = '''
+        {{
+            "dnsProfile": {{
+                "attributes": {{
                     "dn": "uni/fabric/dnsp-default",
                     "name": "default",
                     "status": "created,modified"
-                },
+                }},
                 "children": [
-                    {
-                        "dnsProv": {
-                            "attributes": {
-                                "addr": "%s" % address,
-                                "preferred": "%s" % preferred,
-                                "status": "%s" % status,
-                                "rn": "prov-[%s]" % address
-                            }
-                        }
-                    },
-                    {
-                        "dnsDomain": {
-                            "attributes": {
-                                "isDefault": "%s" % domain_default,
-                                "name": "%s" % domain,
-                                "rn": "dom-%s" % domain,
-                                "status": "%s" % domain_status
-                            }
-                        }
-                    }
+                    {{
+                        "dnsProv": {{
+                            "attributes": {{
+                                "addr": "{address}",
+                                "preferred": "{preferred}",
+                                "status": "{status}",
+                                "rn": "prov-[{address}]"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "dnsDomain": {{
+                            "attributes": {{
+                                "isDefault": "{domain_default}",
+                                "name": "{domain}",
+                                "rn": "dom-{domain}",
+                                "status": "{domain_status}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(address=address, preferred=preferred, status=status,
+                   domain_default=domain_default, domain=domain,
+                   domain_status=domain_status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/fabric/dnsp-default.json'
-                       % (self.apic), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/fabric/dnsp-default.json'
+                       .format(self.apic), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("DNS Server Failed to deploy. Exception: %s" % e)
+            print("DNS Server Failed to deploy. Exception: {}".format(e))
             status = 666
-        payload = {
+        payload = '''
+        {
             "dnsRsProfileToEpg": {
                 "attributes": {
                     "tDn": "uni/tn-mgmt/mgmtp-default/oob-default",
                     "status": "created,modified"
-                },
+                }
             }
         }
+        '''
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/fabric/dnsp-default/rsProfileToEpg.json'
-                       % (self.apic), data=json.dumps(payload),
-                       cookies=self.cookies, verify=False)
+            r = s.post('https://{}/api/node/mo/uni/fabric/dnsp-default/rsProfi'
+                       'leToEpg.json'.format(self.apic),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
         except Exception as e:
-            print("DNS to OOB EPG Failed to deploy. Exception: %s" % e)
+            print("DNS to OOB EPG Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -286,24 +311,29 @@ class FabPodPol(object):
         except:
             status = 667
             return status
-        payload = {
-            "bgpAsP": {
-                "attributes": {
+        payload = '''
+        {{
+            "bgpAsP": {{
+                "attributes": {{
                     "dn": "uni/fabric/bgpInstP-default/as",
-                    "asn": "%s" % asn,
+                    "asn": "{asn}",
                     "rn": "as",
-                    "status": "%s" % status
-                },
-            }
-        }
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(asn=asn, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/fabric/bgpInstP-default/as.json'
-                       % (self.apic), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/fabric/bgpInstP-default/as.'
+                       'json'.format(self.apic), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("Fabric BGP Policy Failed to deploy. Exception: %s" % e)
+            print("Fabric BGP Policy Failed to deploy. Exception: {}"
+                  .format(e))
             status = 666
         return status
 
@@ -316,113 +346,130 @@ class FabPodPol(object):
         except:
             status = 667
             return status
-        payload = {
-            "bgpRRNodePEp": {
-                "attributes": {
-                    "dn": "uni/fabric/bgpInstP-default/rr/node-%s" % rr,
-                    "id": "%s" % rr,
-                    "rn": "node-%s" % rr,
-                    "status": "%s" % status
-                },
-            }
-        }
+        payload = '''
+        {{
+            "bgpRRNodePEp": {{
+                "attributes": {{
+                    "dn": "uni/fabric/bgpInstP-default/rr/node-{rr}",
+                    "id": "{rr}",
+                    "rn": "node-{rr}",
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(rr=rr, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/fabric/bgpInstP-default/rr/node-%s.json'
-                       % (self.apic, rr), data=json.dumps(payload),
-                       cookies=self.cookies, verify=False)
+            r = s.post('https://{}/api/node/mo/uni/fabric/bgpInstP-default/rr/'
+                       'node-{}.json'.format(self.apic, rr),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
             status = r.status_code
         except Exception as e:
-            print("Fabric Route Reflector Failed to deploy. Exception: %s" % e)
+            print("Fabric Route Reflector Failed to deploy. Exception: {}"
+                  .format(e))
             status = 666
         return status
 
     def pod_pol(self, name, status):
-        payload = {
-            "fabricPodPGrp": {
-                "attributes": {
-                    "dn": "uni/fabric/funcprof/podpgrp-%s" % name,
-                    "name": "%s" % name,
-                    "rn": "podpgrp-%s" % name,
-                    "status": "%s" % status
-                },
+        payload = '''
+        {{
+            "fabricPodPGrp": {{
+                "attributes": {{
+                    "dn": "uni/fabric/funcprof/podpgrp-{name}",
+                    "name": "{name}",
+                    "rn": "podpgrp-{name}",
+                    "status": "{status}"
+                }},
                 "children": [
-                    {
-                        "fabricRsTimePol": {
-                            "attributes": {
+                    {{
+                        "fabricRsTimePol": {{
+                            "attributes": {{
                                 "tnDatetimePolName": "default",
                                 "status": "created,modified"
-                            },
-                        }
-                    },
-                    {
-                        "fabricRsPodPGrpIsisDomP": {
-                            "attributes": {
+                            }}
+                        }}
+                    }},
+                    {{
+                        "fabricRsPodPGrpIsisDomP": {{
+                            "attributes": {{
                                 "tnIsisDomPolName": "default",
                                 "status": "created,modified"
-                            },
-                        }
-                    },
-                    {
-                        "fabricRsPodPGrpCoopP": {
-                            "attributes": {
+                            }}
+                        }}
+                    }},
+                    {{
+                        "fabricRsPodPGrpCoopP": {{
+                            "attributes": {{
                                 "tnCoopPolName": "default",
                                 "status": "created,modified"
-                            },
-                        }
-                    },
-                    {
-                        "fabricRsPodPGrpBGPRRP": {
-                            "attributes": {
+                            }}
+                        }}
+                    }},
+                    {{
+                        "fabricRsPodPGrpBGPRRP": {{
+                            "attributes": {{
                                 "tnBgpInstPolName": "default",
                                 "status": "created,modified"
-                            },
-                        }
-                    },
-                    {
-                        "fabricRsCommPol": {
-                            "attributes": {
+                            }}
+                        }}
+                    }},
+                    {{
+                        "fabricRsCommPol": {{
+                            "attributes": {{
                                 "tnCommPolName": "default",
                                 "status": "created,modified"
-                            },
-                        }
-                    },
-                    {
-                        "fabricRsSnmpPol": {
-                            "attributes": {
+                            }}
+                        }}
+                    }},
+                    {{
+                        "fabricRsSnmpPol": {{
+                            "attributes": {{
                                 "tnSnmpPolName": "default",
                                 "status": "created,modified"
-                            },
-                        }
-                    }
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(name=name, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/fabric/funcprof/podpgrp-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
-                       cookies=self.cookies, verify=False)
+            r = s.post('https://{}/api/node/mo/uni/fabric/funcprof/podpgrp-{}.'
+                       'json'.format(self.apic, name),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
             status = r.status_code
         except Exception as e:
-            print("Fabric Pod Policy Failed to deploy. Exception: %s" % e)
+            print("Fabric Pod Policy Failed to deploy. Exception: {}"
+                  .format(e))
             status = 666
-        payload = {
-            "fabricRsPodPGrp": {
-                "attributes": {
-                    "tDn": "uni/fabric/funcprof/podpgrp-%s" % name,
+        payload = '''
+        {{
+            "fabricRsPodPGrp": {{
+                "attributes": {{
+                    "tDn": "uni/fabric/funcprof/podpgrp-{name}",
                     "status": "created,modified"
-                },
-            }
-        }
+                }}
+            }}
+        }}
+        '''.format(name=name)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/fabric/podprof-default/pods-default-typ-ALL/rspodPGrp.json'
-                       % (self.apic), data=json.dumps(payload),
-                       cookies=self.cookies, verify=False)
+            r = s.post('https://{}/api/node/mo/uni/fabric/podprof-default/pods'
+                       '-default-typ-ALL/rspodPGrp.json'.format(self.apic),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
             status = r.status_code
         except Exception as e:
-            print("Assigning Pod Policy Failed. Exception: %s" % e)
+            print("Assigning Pod Policy Failed. Exception: {}".format(e))
             status = 666
         return status
 
@@ -438,25 +485,29 @@ class FabAccPol(object):
     # state: enabled | disabled
     # status: created | created,modified | deleted
     def cdp(self, name, state, status):
-        payload = {
-            'cdpIfPol': {
-                'attributes': {
-                    'dn': 'uni/infra/cdpIfP-%s' % name,
-                    'name': '%s' % name,
-                    'adminSt': '%s' % state,
-                    'rn': 'cdpIfP-%s' % name,
-                    'status': '%s' % status
-                },
-            }
-        }
+        payload = '''
+        {{
+            "cdpIfPol": {{
+                "attributes": {{
+                    "dn": "uni/infra/cdpIfP-{name}",
+                    "name": "{name}",
+                    "adminSt": "{state}",
+                    "rn": "cdpIfP-{name}",
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(name=name, state=state, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/cdpIfP-%s.json' %
-                       (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/cdpIfP-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("CDP Policy Failed to deploy. Exception: %s" % e)
+            print("CDP Policy Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -466,26 +517,30 @@ class FabAccPol(object):
     #   Note: The configured state is deployed to both Tx and Rx
     # status: created | created,modified | deleted
     def lldp(self, name, state, status):
-        payload = {
-            'lldpIfPol': {
-                'attributes': {
-                    'dn': 'uni/infra/lldpIfP-%s' % name,
-                    'name': '%s' % name,
-                    'adminRxSt': '%s' % state,
-                    'adminTxSt': '%s' % state,
-                    'rn': 'lldpIfP-%s' % name,
-                    'status': '%s' % status
-                },
-            }
-        }
+        payload = '''
+        {{
+            "lldpIfPol": {{
+                "attributes": {{
+                    "dn": "uni/infra/lldpIfP-{name}",
+                    "name": "{name}",
+                    "adminRxSt": "{state}",
+                    "adminTxSt": "{state}",
+                    "rn": "lldpIfP-{name}",
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(name=name, state=state, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/lldpIfP-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/lldpIfP-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("LLDP Policy Failed to deploy. Exception: %s" % e)
+            print("LLDP Policy Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -496,25 +551,29 @@ class FabAccPol(object):
     #   Note: 100G should be available soon if not already in some versions
     # status: created | created,modified | deleted
     def link(self, name, auto_neg, speed, status):
-        payload = {
-            'fabricHIfPol': {
-                'attributes': {
-                    'dn': 'uni/infra/hintfpol-%s' % name,
-                    'name': '%s' % name,
-                    'autoNeg': '%s' % auto_neg,
-                    'speed': '%s' % speed,
-                    'status': '%s' % status
-                }
-            }
-        }
+        payload = '''
+        {{
+            "fabricHIfPol": {{
+                "attributes": {{
+                    "dn": "uni/infra/hintfpol-{name}",
+                    "name": "{name}",
+                    "autoNeg": "{auto_neg}",
+                    "speed": "{speed}",
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(name=name, auto_neg=auto_neg, speed=speed, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/hintfpol-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/hintfpol-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("Link Policy Failed to deploy. Exception: %s" % e)
+            print("Link Policy Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -526,26 +585,31 @@ class FabAccPol(object):
     #   Note: The configured state is deployed to both Tx and Rx
     # status: created | created,modified | deleted
     def pc(self, name, mode, status):
-        payload = {
-            'lacpLagPol': {
-                'attributes': {
-                    'dn': 'uni/infra/lacplagp-%s' % name,
-                    'name': '%s' % name,
-                    'ctrl': 'fast-sel-hot-stdby,graceful-conv,susp-individual',
-                    'name': '%s' % name,
-                    'status': '%s' % status,
-                    'mode': '%s' % mode
-                },
-            }
-        }
+        payload = '''
+        {{
+            "lacpLagPol": {{
+                "attributes": {{
+                    "dn": "uni/infra/lacplagp-{name}",
+                    "name": "{name}",
+                    "ctrl": "fast-sel-hot-stdby,graceful-conv,susp-individual",
+                    "name": "{name}",
+                    "status": "{status}",
+                    "mode": "{mode}"
+                }}
+            }}
+        }}
+        '''.format(name=name, status=status, mode=mode)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/lacplagp-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/lacplagp-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("Port Channel Policy Failed to deploy. Exception: %s" % e)
+            print("Port Channel Policy Failed to deploy. Exception: {e}"
+                  .format(e))
             status = 666
         return status
 
@@ -554,24 +618,29 @@ class FabAccPol(object):
     # state: enabled | disabled
     # status: created | created,modified | deleted
     def ppv(self, name, state, status):
-        payload = {
-            'l2IfPol': {
-                'attributes': {
-                    'dn': 'uni/infra/l2IfP-%s' % name,
-                    'name': '%s' % name,
-                    'vlanScope': '%s' % state,
-                    'status': '%s' % status
-                }
-            }
-        }
+        payload = '''
+        {{
+            "l2IfPol": {{
+                "attributes": {{
+                    "dn": "uni/infra/l2IfP-{name}",
+                    "name": "{name}",
+                    "vlanScope": "{state}",
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(name=name, state=state, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/l2IfP-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/l2IfP-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("Per Port VLAN Policy Failed to deploy. Exception: %s" % e)
+            print("Per Port VLAN Policy Failed to deploy. Exception: {}"
+                  .format(e))
             status = 666
         return status
 
@@ -580,24 +649,28 @@ class FabAccPol(object):
     # state: enabled | disabled
     # status: created | created,modified | deleted
     def mcp_intf(self, name, state, status):
-        payload = {
-            'mcpIfPol': {
-                'attributes': {
-                    'dn': 'uni/infra/mcpIfP-%s' % name,
-                    'name': '%s' % name,
-                    'status': '%s' % status,
-                    'adminSt': '%s' % state
-                }
-            }
-        }
+        payload = '''
+        {{
+            "mcpIfPol": {{
+                "attributes": {{
+                    "dn": "uni/infra/mcpIfP-{name}",
+                    "name": "{name}",
+                    "status": "{status}",
+                    "adminSt": "{state}"
+                }}
+            }}
+        }}
+        '''.format(name=name, status=status, state=state)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/mcpIfP-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/mcpIfP-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("MCP Interface Failed to deploy. Exception: %s" % e)
+            print("MCP Interface Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -605,23 +678,27 @@ class FabAccPol(object):
     # password: string for global MCP password
     # state: enabled | disabled
     def mcp_global(self, password, state):
-        payload = {
-            'mcpInstPol': {
-                'attributes': {
-                    'dn': 'uni/infra/mcpInstP-default',
-                    'key': '%s' % password,
-                    'adminSt': '%s' % state
-                }
-            }
-        }
+        payload = '''
+        {{
+            "mcpInstPol": {{
+                "attributes": {{
+                    "dn": "uni/infra/mcpInstP-default",
+                    "key": "{password}",
+                    "adminSt": "{state}"
+                }}
+            }}
+        }}
+        '''.format(password=password, state=state)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/mcpInstP-default.json'
-                       % self.apic, data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/mcpInstP-default.json'
+                       .format(self.apic), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("MCP Global Failed to deploy. Exception: %s" % e)
+            print("MCP Global Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -629,22 +706,28 @@ class FabAccPol(object):
     # event: mcp-loop | ep-move | bpduguard
     # state: true | false
     def err_disable(self, event, state):
-        payload = {
-            'edrEventP': {
-                'attributes': {
-                    'dn': 'uni/infra/edrErrDisRecoverPol-default/edrEventP-event-%s' % event,
-                    'recover': '%s' % state
-                },
-            }
-        }
+        payload = '''
+        {{
+            "edrEventP": {{
+                "attributes": {{
+                    "dn": "uni/infra/edrErrDisRecoverPol-default/edrEventP-event-{event}",
+                    "recover": "{state}"
+                }}
+            }}
+        }}
+        '''.format(event=event, state=state)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/edrErrDisRecoverPol-default/edrEventP-event-%s.json'
-                       % (self.apic, event), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/edrErrDisRecoverPol-d'
+                       'efault/edrEventP-event-{}.json'
+                       .format(self.apic, event), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("Error Disable Policy Failed to deploy. Exception: %s" % e)
+            print("Error Disable Policy Failed to deploy. Exception: {}"
+                  .format(e))
             status = 666
         return status
 
@@ -662,36 +745,42 @@ class FabAccPol(object):
         except:
             status = 667
             return status
-        payload = {
-            'fvnsVlanInstP': {
-                'attributes': {
-                    'allocMode': '%s' % mode,
-                    'dn': 'uni/infra/vlanns-[%s]-%s' % (name, mode),
-                    'name': '%s' % name,
-                    'status': '%s' % status
-                },
-                'children': [
-                    {
-                        'fvnsEncapBlk': {
-                            'attributes': {
-                                'allocMode': '%s' % range_mode,
-                                'from': 'vlan-%s' % start,
-                                'to': 'vlan-%s' % end,
-                                'status': '%s' % status
-                            }
-                        }
-                    }
+        payload = '''
+        {{
+            "fvnsVlanInstP": {{
+                "attributes": {{
+                    "allocMode": "{mode}",
+                    "dn": "uni/infra/vlanns-[{name}]-{mode}",
+                    "name": "{name}",
+                    "status": "{status}"
+                }},
+                "children": [
+                    {{
+                        "fvnsEncapBlk": {{
+                            "attributes": {{
+                                "allocMode": "{range_mode}",
+                                "from": "vlan-{start}",
+                                "to": "vlan-{end}",
+                                "status": "{status}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(mode=mode, name=name, status=status, range_mode=range_mode,
+                   start=start, end=end)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/vlanns-[%s]-%s.json'
-                       % (self.apic, name, mode), data=json.dumps(payload),
-                       cookies=self.cookies, verify=False)
+            r = s.post('https://{}/api/node/mo/uni/infra/vlanns-[{}]-{}.json'
+                       .format(self.apic, name, mode),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
             status = r.status_code
         except Exception as e:
-            print("VLAN Pool Failed to deploy. Exception: %s" % e)
+            print("VLAN Pool Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -718,160 +807,172 @@ class FabAccPol(object):
             status = 667
             return status
         if override == 'created,modified':
-            payload = {
-                'infraAttEntityP': {
-                    'attributes': {
-                        'dn': 'uni/infra/attentp-%s' % name,
-                        'name': '%s' % name,
-                        'status': '%s' % status
-                    },
-                    'children': [
-                        {
-                            'infraContNS': {
-                                'attributes': {
-                                    'rn': 'nscont',
-                                    'status': '%s' % status
-                                }
-                            }
-                        },
-                        {
-                            'infraContDomP': {
-                                'attributes': {
-                                    'rn': 'dompcont',
-                                    'status': '%s' % status
-                                }
-                            }
-                        },
-                        {
-                            'infraProvAcc': {
-                                'attributes': {
-                                    'name': 'default',
-                                    'rn': 'provacc',
-                                    'status': '%s' % infra
-                                },
-                                'children': [
-                                    {
-                                        'dhcpInfraProvP': {
-                                            'attributes': {
-                                                'mode': 'controller',
-                                                'rn': 'infraprovp',
-                                                'status': '%s' % infra
-                                            }
-                                        }
-                                    },
-                                    {
-                                        'infraRsFuncToEpg': {
-                                            'attributes': {
-                                                'encap': 'vlan-%s' % infra_vlan,
-                                                'rn': 'rsfuncToEpg-[uni/tn-infra/ap-access/epg-default]',
-                                                'status': '%s' % infra
-                                            }
-                                        }
-                                    }
+            payload = '''
+            {{
+                "infraAttEntityP": {{
+                    "attributes": {{
+                        "dn": "uni/infra/attentp-{name}",
+                        "name": "{name}",
+                        "status": "{status}"
+                    }},
+                    "children": [
+                        {{
+                            "infraContNS": {{
+                                "attributes": {{
+                                    "rn": "nscont",
+                                    "status": "{status}"
+                                }}
+                            }}
+                        }},
+                        {{
+                            "infraContDomP": {{
+                                "attributes": {{
+                                    "rn": "dompcont",
+                                    "status": "{status}"
+                                }}
+                            }}
+                        }},
+                        {{
+                            "infraProvAcc": {{
+                                "attributes": {{
+                                    "name": "default",
+                                    "rn": "provacc",
+                                    "status": "{infra}"
+                                }},
+                                "children": [
+                                    {{
+                                        "dhcpInfraProvP": {{
+                                            "attributes": {{
+                                                "mode": "controller",
+                                                "rn": "infraprovp",
+                                                "status": "{infra}"
+                                            }}
+                                        }}
+                                    }},
+                                    {{
+                                        "infraRsFuncToEpg": {{
+                                            "attributes": {{
+                                                "encap": "vlan-{infra_vlan}",
+                                                "rn": "rsfuncToEpg-[uni/tn-infra/ap-access/epg-default]",
+                                                "status": "{infra}"
+                                            }}
+                                        }}
+                                    }}
                                 ]
-                            }
-                        },
-                        {
-                            'infraAttPolicyGroup': {
-                                'attributes': {
-                                    'rn': 'attpolgrp',
-                                    'status': '%s' % override
-                                },
-                                'children': [
-                                    {
-                                        'infraRsOverrideCdpIfPol': {
-                                            'attributes': {
-                                                'rn': 'rsoverrideCdpIfPol',
-                                                'status': '%s' % override,
-                                                'tnCdpIfPolName': '%s' % override_cdp
-                                            }
-                                        }
-                                    },
-                                    {
-                                        'infraRsOverrideLacpPol': {
-                                            'attributes': {
-                                                'rn': 'rsoverrideLacpPol',
-                                                'status': '%s' % override,
-                                                'tnLacpLagPolName': '%s' % override_pc
-                                            }
-                                        }
-                                    },
-                                    {
-                                        'infraRsOverrideLldpIfPol': {
-                                            'attributes': {
-                                                'rn': 'rsoverrideLldpIfPol',
-                                                'status': '%s' % override,
-                                                'tnLldpIfPolName': '%s' % override_lldp
-                                            }
-                                        }
-                                    }
+                            }}
+                        }},
+                        {{
+                            "infraAttPolicyGroup": {{
+                                "attributes": {{
+                                    "rn": "attpolgrp",
+                                    "status": "{override}"
+                                }},
+                                "children": [
+                                    {{
+                                        "infraRsOverrideCdpIfPol": {{
+                                            "attributes": {{
+                                                "rn": "rsoverrideCdpIfPol",
+                                                "status": "{override}",
+                                                "tnCdpIfPolName": "{override_cdp}"
+                                            }}
+                                        }}
+                                    }},
+                                    {{
+                                        "infraRsOverrideLacpPol": {{
+                                            "attributes": {{
+                                                "rn": "rsoverrideLacpPol",
+                                                "status": "{override}",
+                                                "tnLacpLagPolName": "{override_pc}"
+                                            }}
+                                        }}
+                                    }},
+                                    {{
+                                        "infraRsOverrideLldpIfPol": {{
+                                            "attributes": {{
+                                                "rn": "rsoverrideLldpIfPol",
+                                                "status": "{override}",
+                                                "tnLldpIfPolName": "{override_lldp}"
+                                            }}
+                                        }}
+                                    }}
                                 ]
-                            }
-                        }
+                            }}
+                        }}
                     ]
-                }
-            }
+                }}
+            }}
+            '''.format(name=name, status=status, infra=infra,
+                       infra_vlan=infra_vlan, override=override,
+                       override_pc=override_pc, override_cdp=override_cdp,
+                       override_lldp=override_lldp)
         else:
-            payload = {
-                'infraAttEntityP': {
-                    'attributes': {
-                        'dn': 'uni/infra/attentp-%s' % name,
-                        'name': '%s' % name,
-                        'status': '%s' % status
-                    },
-                    'children': [
-                        {
-                            'infraContNS': {
-                                'attributes': {
-                                    'rn': 'nscont',
-                                    'status': '%s' % status
-                                }
-                            }
-                        },
-                        {
-                            'infraContDomP': {
-                                'attributes': {
-                                    'rn': 'dompcont',
-                                    'status': '%s' % status
-                                }
-                            }
-                        },
-                        {
-                            'infraProvAcc': {
-                                'attributes': {
-                                    'name': 'default',
-                                    'rn': 'provacc',
-                                    'status': '%s' % infra
-                                },
-                                'children': [
-                                    {
-                                        'dhcpInfraProvP': {
-                                            'attributes': {
-                                                'mode': 'controller',
-                                                'rn': 'infraprovp',
-                                                'status': '%s' % infra
-                                            }
-                                        }
-                                    },
-                                    {
-                                        'infraRsFuncToEpg': {
-                                            'attributes': {
-                                                'encap': 'vlan-%s' % infra_vlan,
-                                                'rn': 'rsfuncToEpg-[uni/tn-infra/ap-access/epg-default]',
-                                                'status': '%s' % infra
-                                            }
-                                        }
-                                    }
+            payload = '''
+            {{
+                "infraAttEntityP": {{
+                    "attributes": {{
+                        "dn": "uni/infra/attentp-{name}",
+                        "name": "{name}",
+                        "status": "{status}"
+                    }},
+                    "children": [
+                        {{
+                            "infraContNS": {{
+                                "attributes": {{
+                                    "rn": "nscont",
+                                    "status": "{status}"
+                                }}
+                            }}
+                        }},
+                        {{
+                            "infraContDomP": {{
+                                "attributes": {{
+                                    "rn": "dompcont",
+                                    "status": "{status}"
+                                }}
+                            }}
+                        }},
+                        {{
+                            "infraProvAcc": {{
+                                "attributes": {{
+                                    "name": "default",
+                                    "rn": "provacc",
+                                    "status": "{infra}"
+                                }},
+                                "children": [
+                                    {{
+                                        "dhcpInfraProvP": {{
+                                            "attributes": {{
+                                                "mode": "controller",
+                                                "rn": "infraprovp",
+                                                "status": "{infra}"
+                                            }}
+                                        }}
+                                    }},
+                                    {{
+                                        "infraRsFuncToEpg": {{
+                                            "attributes": {{
+                                                "encap": "vlan-{infra_vlan}",
+                                                "rn": "rsfuncToEpg-[uni/tn-infra/ap-access/epg-default]",
+                                                "status": "{infra}"
+                                            }}
+                                        }}
+                                    }}
                                 ]
-                            }
-                        },
+                            }}
+                        }}
                     ]
-                }
-            }
+                }}
+            }}
+            '''.format(name=name, status=status, infra=infra,
+                       infra_vlan=infra_vlan, override=override,
+                       override_pc=override_pc, override_cdp=override_cdp,
+                       override_lldp=override_lldp)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/attentp-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/attentp-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
@@ -884,34 +985,38 @@ class FabAccPol(object):
     # status: created | created,modified | deleted
     # vlan_pool: Name of the VLAN pool to associate to the L3 Out
     def l3_dom(self, name, status, vlan_pool):
-        payload = {
-            'l3extDomP': {
-                'attributes': {
-                    'dn': 'uni/l3dom-%s' % name,
-                    'name': '%s' % name,
-                    'status': '%s' % status
-                },
-                'children': [
-                    {
-                        'infraRsVlanNs': {
-                            'attributes': {
-                                'rn': 'rsvlanNs',
-                                'status': '%s' % status,
-                                'tDn': 'uni/infra/vlanns-[%s]-dynamic' % vlan_pool
-                            }
-                        }
-                    }
+        payload = '''
+        {{
+            "l3extDomP": {{
+                "attributes": {{
+                    "dn": "uni/l3dom-{name}",
+                    "name": "{name}",
+                    "status": "{status}"
+                }},
+                "children": [
+                    {{
+                        "infraRsVlanNs": {{
+                            "attributes": {{
+                                "rn": "rsvlanNs",
+                                "status": "{status}",
+                                "tDn": "uni/infra/vlanns-[{vlan_pool}]-dynamic"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(name=name, status=status, vlan_pool=vlan_pool)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/l3dom-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/l3dom-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("L3 Domain Failed to deploy. Exception: %s" % e)
+            print("L3 Domain Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -920,34 +1025,38 @@ class FabAccPol(object):
     # status: created | created,modified | deleted
     # vlan_pool: Name of the VLAN pool to associate to the Physical Domain
     def phys_dom(self, name, status, vlan_pool):
-        payload = {
-            'physDomP': {
-                'attributes': {
-                    'dn': 'uni/phys-%s' % name,
-                    'name': '%s' % name,
-                    'status': '%s' % status
-                },
-                'children': [
-                    {
-                        'infraRsVlanNs': {
-                            'attributes': {
-                                'rn': 'rsvlanNs',
-                                'status': '%s' % status,
-                                'tDn': 'uni/infra/vlanns-[%s]-dynamic' % vlan_pool
-                            }
-                        }
-                    }
+        payload = '''
+        {{
+            "physDomP": {{
+                "attributes": {{
+                    "dn": "uni/phys-{name}",
+                    "name": "{name}",
+                    "status": "{status}"
+                }},
+                "children": [
+                    {{
+                        "infraRsVlanNs": {{
+                            "attributes": {{
+                                "rn": "rsvlanNs",
+                                "status": "{status}",
+                                "tDn": "uni/infra/vlanns-[{vlan_pool}]-dynamic"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(name=name, status=status, vlan_pool=vlan_pool)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/phys-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/phys-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("Physical Domain Failed to deploy. Exception: %s" % e)
+            print("Physical Domain Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -956,34 +1065,38 @@ class FabAccPol(object):
     # status: created | created,modified | deleted
     # l3_dom: Name of the L3 Domain to be hooked to the AEP
     def l3_aep(self, name, status, l3_dom):
-        payload = {
-            'infraAttEntityP': {
-                'attributes': {
-                    'dn': 'uni/infra/attentp-%s' % name,
-                    'name': '%s' % name,
-                    'status': 'created,modified'
-                },
-                'children': [
-                    {
-                        'infraRsDomP': {
-                            'attributes': {
-                                'rn': 'rsdomP-[uni/l3dom-%s]' % l3_dom,
-                                'status': '%s' % status,
-                                'tDn': 'uni/l3dom-%s' % l3_dom
-                            }
-                        }
-                    }
+        payload = '''
+        {{
+            "infraAttEntityP": {{
+                "attributes": {{
+                    "dn": "uni/infra/attentp-{name}",
+                    "name": "{name}",
+                    "status": "created,modified"
+                }},
+                "children": [
+                    {{
+                        "infraRsDomP": {{
+                            "attributes": {{
+                                "rn": "rsdomP-[uni/l3dom-{l3_dom}]",
+                                "status": "{status}",
+                                "tDn": "uni/l3dom-{l3_dom}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(name=name, status=status, l3_dom=l3_dom)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/attentp-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/attentp-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("L3 Domain to AEP Failed to deploy. Exception: %s" % e)
+            print("L3 Domain to AEP Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -992,34 +1105,39 @@ class FabAccPol(object):
     # status: created | created,modified | deleted
     # l3_dom: Name of the L3 Domain to be hooked to the AEP
     def phys_aep(self, name, dom_name, status):
-        payload = {
-            'infraAttEntityP': {
-                'attributes': {
-                    'dn': 'uni/infra/attentp-%s' % name,
-                    'name': '%s' % name,
-                    'status': 'created,modified'
-                },
-                'children': [
-                    {
-                        'infraRsDomP': {
-                            'attributes': {
-                                'rn': 'rsdomP-[uni/phys-%s]' % dom_name,
-                                'status': '%s' % status,
-                                'tDn': 'uni/phys-%s' % dom_name
-                            }
-                        }
-                    }
+        payload = '''
+        {{
+            "infraAttEntityP": {{
+                "attributes": {{
+                    "dn": "uni/infra/attentp-{name}",
+                    "name": "{name}",
+                    "status": "created,modified"
+                }},
+                "children": [
+                    {{
+                        "infraRsDomP": {{
+                            "attributes": {{
+                                "rn": "rsdomP-[uni/phys-{dom_name}]",
+                                "status": "{status}",
+                                "tDn": "uni/phys-{dom_name}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(name=name, dom_name=dom_name, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/attentp-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/attentp-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("Physical Domain to AEP Failed to deploy. Exception: %s" % e)
+            print("Physical Domain to AEP Failed to deploy. Exception: {}"
+                  .format(e))
             status = 666
         return status
 
@@ -1037,55 +1155,59 @@ class FabAccPol(object):
         except:
             status = 667
             return status
-        payload = {
-            'fabricExplicitGEp': {
-                'attributes': {
-                    'dn': 'uni/fabric/protpol/expgep-%s' % name,
-                    'name': '%s' % name,
-                    'id': '%s' % id,
-                    'rn': 'expgep-%s' % name,
-                    'status': '%s' % status
-                },
-                'children': [
-                    {
-                        'fabricNodePEp': {
-                            'attributes': {
-                                'dn': 'uni/fabric/protpol/expgep-%s/nodepep-%s' % (name, sw1),
-                                'id': '%s' % sw1,
-                                'status': '%s' % status,
-                                'rn': 'nodepep-%s' % sw1
-                            },
-                        }
-                    },
-                    {
-                        'fabricNodePEp': {
-                            'attributes': {
-                                'dn': 'uni/fabric/protpol/expgep-%s/nodepep-%s' % (name, sw2),
-                                'id': '%s' % sw2,
-                                'status': '%s' % status,
-                                'rn': 'nodepep-%s' % sw2
-                            },
-                        }
-                    },
-                    {
-                        'fabricRsVpcInstPol': {
-                            'attributes': {
-                                'tnVpcInstPolName': 'default',
-                                'status': '%s' % status
-                            },
-                        }
-                    }
+        payload = '''
+        {{
+            "fabricExplicitGEp": {{
+                "attributes": {{
+                    "dn": "uni/fabric/protpol/expgep-{name}",
+                    "name": "{name}",
+                    "id": "{id}",
+                    "rn": "expgep-{name}",
+                    "status": "{status}"
+                }},
+                "children": [
+                    {{
+                        "fabricNodePEp": {{
+                            "attributes": {{
+                                "dn": "uni/fabric/protpol/expgep-{name}/nodepep-{sw1}",
+                                "id": "{sw1}",
+                                "status": "{status}",
+                                "rn": "nodepep-{sw1}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "fabricNodePEp": {{
+                            "attributes": {{
+                                "dn": "uni/fabric/protpol/expgep-{name}/nodepep-{sw2}",
+                                "id": "{sw2}",
+                                "status": "{status}",
+                                "rn": "nodepep-{sw2}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "fabricRsVpcInstPol": {{
+                            "attributes": {{
+                                "tnVpcInstPolName": "default",
+                                "status": "{status}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(name=name, id=id, status=status, sw1=sw1, sw2=sw2)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/fabric/protpol/expgep-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/fabric/protpol/expgep-{}.jso'
+                       'n'.format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("vPC Policy Failed to deploy. Exception: %s" % e)
+            print("vPC Policy Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -1102,63 +1224,67 @@ class FabAccPol(object):
         except:
             status = 667
             return status
-        payload = {
-            'infraNodeP': {
-                'attributes': {
-                    'dn': 'uni/infra/nprof-%s' % name,
-                    'name': '%s' % name,
-                    'rn': 'nprof-%s' % name,
-                    'status': '%s' % status
-                },
-                'children': [
-                    {
-                        'infraLeafS': {
-                            'attributes': {
-                                'dn': 'uni/infra/nprof-%s/leaves-%s-typ-range' % (name, name),
-                                'type': 'range',
-                                'name': '%s' % name,
-                                'rn': 'leaves-%s-typ-range' % name,
-                                'status': '%s' % status
-                            },
-                            'children': [
-                                {
-                                    'infraNodeBlk': {
-                                        'attributes': {
-                                            'dn': 'uni/infra/nprof-%s/leaves-%s-typ-range/nodeblk-L%s' % (name, name, sw1),
-                                            'from_': '%s' % sw1,
-                                            'to_': '%s' % sw1,
-                                            'name': 'L%s' % sw1,
-                                            'rn': 'nodeblk-L%s' % sw1,
-                                            'status': '%s' % status
-                                        },
-                                    }
-                                },
-                                {
-                                    'infraNodeBlk': {
-                                        'attributes': {
-                                            'dn': 'uni/infra/nprof-%s/leaves-%s-typ-range/nodeblk-L%s'  % (name, name, sw2),
-                                            'from_': '%s' % sw2,
-                                            'to_': '%s' % sw2,
-                                            'name': 'L%s' % sw2,
-                                            'rn': 'nodeblk-L%s' % sw2,
-                                            'status': '%s' % status
-                                        },
-                                    }
-                                }
+        payload = '''
+        {{
+            "infraNodeP": {{
+                "attributes": {{
+                    "dn": "uni/infra/nprof-{name}",
+                    "name": "{name}",
+                    "rn": "nprof-{name}",
+                    "status": "{status}"
+                }},
+                "children": [
+                    {{
+                        "infraLeafS": {{
+                            "attributes": {{
+                                "dn": "uni/infra/nprof-{name}/leaves-{name}-typ-range",
+                                "type": "range",
+                                "name": "{name}",
+                                "rn": "leaves-{name}-typ-range",
+                                "status": "{status}"
+                            }},
+                            "children": [
+                                {{
+                                    "infraNodeBlk": {{
+                                        "attributes": {{
+                                            "dn": "uni/infra/nprof-{name}/leaves-{name}-typ-range/nodeblk-L{sw1}",
+                                            "from_": "{sw1}",
+                                            "to_": "{sw1}",
+                                            "name": "L{sw1}",
+                                            "rn": "nodeblk-L{sw1}",
+                                            "status": "{status}"
+                                        }}
+                                    }}
+                                }},
+                                {{
+                                    "infraNodeBlk": {{
+                                        "attributes": {{
+                                            "dn": "uni/infra/nprof-{name}/leaves-{name}-typ-range/nodeblk-L{sw2}",
+                                            "from_": "{sw2}",
+                                            "to_": "{sw2}",
+                                            "name": "L{sw2}",
+                                            "rn": "nodeblk-L{sw2}",
+                                            "status": "{status}"
+                                        }}
+                                    }}
+                                }}
                             ]
-                        }
-                    }
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(name=name, status=status, sw1=sw1, sw2=sw2)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/nprof-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/nprof-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("Switch Profile (vPC) Failed to deploy. Exception: %s" % e)
+            print("Switch Profile (vPC) Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -1173,50 +1299,54 @@ class FabAccPol(object):
         except:
             status = 667
             return status
-        payload = {
-            'infraNodeP': {
-                'attributes': {
-                    'dn': 'uni/infra/nprof-%s' % name,
-                    'name': '%s' % name,
-                    'rn': 'nprof-%s' % name,
-                    'status': '%s' % status
-                },
-                'children': [
-                    {
-                        'infraLeafS': {
-                            'attributes': {
-                                'dn': 'uni/infra/nprof-%s/leaves-%s-typ-range' % (name, name),
-                                'type': 'range',
-                                'name': '%s' % name,
-                                'rn': 'leaves-%s-typ-range' % name,
-                                'status': '%s' % status
-                            },
-                            'children': [
-                                {
-                                    'infraNodeBlk': {
-                                        'attributes': {
-                                            'dn': 'uni/infra/nprof-%s/leaves-%s-typ-range/nodeblk-L%s' % (name, name, sw1),
-                                            'from_': '%s' % sw1, 'to_': '%s' % sw1,
-                                            'name': 'L%s' % sw1,'rn': 'nodeblk-L%s' % sw1,
-                                            'status': '%s' % status
-                                        },
-                                    }
-                                }
+        payload = '''
+        {{
+            "infraNodeP": {{
+                "attributes": {{
+                    "dn": "uni/infra/nprof-{name}",
+                    "name": "{name}",
+                    "rn": "nprof-{name}",
+                    "status": "{status}"
+                }},
+                "children": [
+                    {{
+                        "infraLeafS": {{
+                            "attributes": {{
+                                "dn": "uni/infra/nprof-{name}/leaves-{name}-typ-range",
+                                "type": "range",
+                                "name": "{name}",
+                                "rn": "leaves-{name}-typ-range",
+                                "status": "{status}"
+                            }},
+                            "children": [
+                                {{
+                                    "infraNodeBlk": {{
+                                        "attributes": {{
+                                            "dn": "uni/infra/nprof-{name}/leaves-{name}-typ-range/nodeblk-L{sw1}",
+                                            "from_": "{sw1}", "to_": "{sw1}",
+                                            "name": "L{sw1}","rn": "nodeblk-L{sw1}",
+                                            "status": "{status}"
+                                        }}
+                                    }}
+                                }}
                             ]
-                        }
-                    }
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(name=name, status=status, sw1=sw1)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/nprof-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/nprof-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
             print("Switch Profile (single switch) Failed to deploy. "
-                  "Exception: %s" % e)
+                  "Exception: {}".format(e))
             status = 666
         return status
 
@@ -1237,98 +1367,105 @@ class FabAccPol(object):
         Special Note - L2 and Storm Control policies are optional, var_qty
         represents first 9 required vars, and ignores the optional values
         '''
-        payload = {
-            'infraAccBndlGrp': {
-                'attributes': {
-                    'dn': 'uni/infra/funcprof/accbundle-%s' % name,
-                    'lagT': '%s' % lag_type,
-                    'name': '%s' % name,
-                    'rn': 'accbundle-%s' % name,
-                    'status': '%s' % status
-                },
-                'children': [
-                    {
-                        'infraRsMonIfInfraPol': {
-                            'attributes': {
-                                'tnMonInfraPolName': ''
-                            }
-                        }
-                    },
-                    {
-                        'infraRsLldpIfPol': {
-                            'attributes': {
-                                'tnLldpIfPolName': '%s' % lldp
-                            }
-                        }
-                    },
-                    {
-                        'infraRsStpIfPol': {
-                            'attributes': {
-                                'tnStpIfPolName': ''
-                            }
-                        }
-                    },
-                    {
-                        'infraRsCdpIfPol': {
-                            'attributes': {
-                                'tnCdpIfPolName': '%s' % cdp
-                            }
-                        }
-                    },
-                    {
-                        'infraRsAttEntP': {
-                            'attributes': {
-                                'tDn': 'uni/infra/attentp-%s' % aep
-                            }
-                        }
-                    },
-                    {
-                        'infraRsMcpIfPol': {
-                            'attributes': {
-                                'tnMcpIfPolName': '%s' % mcp
-                            }
-                        }
-                    },
-                    {
-                        'infraRsStormctrlIfPol': {
-                            'attributes': {
-                                'tnStormctrlIfPolName': '%s' % storm
-                            }
-                        }
-                    },
-                    {
-                        'infraRsL2IfPol': {
-                            'attributes': {
-                                'tnL2IfPolName': '%s' % ppv,
-                            }
-                        }
-                    },
-                    {
-                        'infraRsLacpPol': {
-                            'attributes': {
-                                'tnLacpLagPolName': '%s' % lag
-                            }
-                        }
-                    },
-                    {
-                        'infraRsHIfPol': {
-                            'attributes': {
-                                'tnFabricHIfPolName': '%s' % link
-                            }
-                        }
-                    }
+        payload = '''
+        {{
+            "infraAccBndlGrp": {{
+                "attributes": {{
+                    "dn": "uni/infra/funcprof/accbundle-{name}",
+                    "lagT": "{lag_type}",
+                    "name": "{name}",
+                    "rn": "accbundle-{name}",
+                    "status": "{status}"
+                }},
+                "children": [
+                    {{
+                        "infraRsMonIfInfraPol": {{
+                            "attributes": {{
+                                "tnMonInfraPolName": ""
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsLldpIfPol": {{
+                            "attributes": {{
+                                "tnLldpIfPolName": "{lldp}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsStpIfPol": {{
+                            "attributes": {{
+                                "tnStpIfPolName": ""
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsCdpIfPol": {{
+                            "attributes": {{
+                                "tnCdpIfPolName": "{cdp}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsAttEntP": {{
+                            "attributes": {{
+                                "tDn": "uni/infra/attentp-{aep}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsMcpIfPol": {{
+                            "attributes": {{
+                                "tnMcpIfPolName": "{mcp}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsStormctrlIfPol": {{
+                            "attributes": {{
+                                "tnStormctrlIfPolName": "{storm}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsL2IfPol": {{
+                            "attributes": {{
+                                "tnL2IfPolName": "{ppv}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsLacpPol": {{
+                            "attributes": {{
+                                "tnLacpLagPolName": "{lag}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsHIfPol": {{
+                            "attributes": {{
+                                "tnFabricHIfPolName": "{link}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(name=name, status=status, lag_type=lag_type, lldp=lldp,
+                   cdp=cdp, aep=aep, mcp=mcp, lag=lag, link=link, ppv=ppv,
+                   storm=storm)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/funcprof/accbundle-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
-                       cookies=self.cookies, verify=False)
+            r = s.post('https://{}/api/node/mo/uni/infra/funcprof/accbundle-{}'
+                       '.json'.format(self.apic, name),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
             status = r.status_code
         except Exception as e:
             print("Interface Policy Group (vPC) Failed to deploy. "
-                  "Exception: %s" % e)
+                  "Exception: {}".format(e))
             status = 666
         return status
 
@@ -1346,90 +1483,96 @@ class FabAccPol(object):
         Special Note - L2 and Storm Control policies are optional, var_qty
         represents first 9 required vars, and ignores the optional values
         '''
-        payload = {
-            'infraAccPortGrp': {
-                'attributes': {
-                    'dn': 'uni/infra/funcprof/accportgrp-%s' % name,
-                    'name': '%s' % name,
-                    'rn': 'accportgrp-%s' % name,
-                    'status': '%s' % status
-                },
-                'children': [
-                    {
-                        'infraRsMonIfInfraPol': {
-                            'attributes': {
-                                'tnMonInfraPolName': ''
-                            }
-                        }
-                    },
-                    {
-                        'infraRsLldpIfPol': {
-                            'attributes': {
-                                'tnLldpIfPolName': '%s' % lldp
-                            }
-                        }
-                    },
-                    {
-                        'infraRsStpIfPol': {
-                            'attributes': {
-                                'tnStpIfPolName': ''
-                            }
-                        }
-                    },
-                    {
-                        'infraRsCdpIfPol': {
-                            'attributes': {
-                                'tnCdpIfPolName': '%s' % cdp
-                            }
-                        }
-                    },
-                    {
-                        'infraRsAttEntP': {
-                            'attributes': {
-                                'tDn': 'uni/infra/attentp-%s' % aep
-                            }
-                        }
-                    },
-                    {
-                        'infraRsMcpIfPol': {
-                            'attributes': {
-                                'tnMcpIfPolName': '%s' % mcp
-                            }
-                        }
-                    },
-                    {
-                        'infraRsL2IfPol': {
-                            'attributes': {
-                                'tnL2IfPolName': '%s' % ppv,
-                            }
-                        }
-                    },
-                    {
-                        'infraRsStormctrlIfPol': {
-                            'attributes': {
-                                'tnStormctrlIfPolName': '%s' % storm
-                            }
-                        }
-                    },
-                    {
-                        'infraRsHIfPol': {
-                            'attributes': {
-                                'tnFabricHIfPolName': '%s' % link
-                            }
-                        }
-                    }
+        payload = '''
+        {{
+            "infraAccPortGrp": {{
+                "attributes": {{
+                    "dn": "uni/infra/funcprof/accportgrp-{name}",
+                    "name": "{name}",
+                    "rn": "accportgrp-{name}",
+                    "status": "{status}"
+                }},
+                "children": [
+                    {{
+                        "infraRsMonIfInfraPol": {{
+                            "attributes": {{
+                                "tnMonInfraPolName": ""
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsLldpIfPol": {{
+                            "attributes": {{
+                                "tnLldpIfPolName": "{lldp}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsStpIfPol": {{
+                            "attributes": {{
+                                "tnStpIfPolName": ""
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsCdpIfPol": {{
+                            "attributes": {{
+                                "tnCdpIfPolName": "{cdp}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsAttEntP": {{
+                            "attributes": {{
+                                "tDn": "uni/infra/attentp-{aep}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsMcpIfPol": {{
+                            "attributes": {{
+                                "tnMcpIfPolName": "{mcp}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsL2IfPol": {{
+                            "attributes": {{
+                                "tnL2IfPolName": "{ppv}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsStormctrlIfPol": {{
+                            "attributes": {{
+                                "tnStormctrlIfPolName": "{storm}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsHIfPol": {{
+                            "attributes": {{
+                                "tnFabricHIfPolName": "{link}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(name=name, status=status, lldp=lldp, cdp=cdp, aep=aep,
+                   mcp=mcp, link=link, ppv=ppv, storm=storm)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/funcprof/accportgrp-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
-                       cookies=self.cookies, verify=False)
+            r = s.post('https://{}/api/node/mo/uni/infra/funcprof/accportgrp-'
+                       '{}.json'.format(self.apic, name),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
             status = r.status_code
         except Exception as e:
             print("Interface Policy Group (Access) Failed to deploy. "
-                  "Exception: %s" % e)
+                  "Exception: {}".format(e))
             status = 666
         return status
 
@@ -1437,24 +1580,28 @@ class FabAccPol(object):
     # name: Name of the Interface Profile
     # status: created | created,modified | deleted
     def int_profile(self, name, status):
-        payload = {
-            "infraAccPortP": {
-                "attributes": {
-                    "dn": "uni/infra/accportprof-%s" % name,
-                    "name": "%s" % name,
-                    "status": "%s" % status
-                }
-            }
-        }
+        payload = '''
+        {{
+            "infraAccPortP": {{
+                "attributes": {{
+                    "dn": "uni/infra/accportprof-{name}",
+                    "name": "{name}",
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(name=name, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/accportprof-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/accportprof-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
             print("Interface Profile Failed to deploy. "
-                  "Exception: %s" % e)
+                  "Exception: {}".format(e))
             status = 666
         return status
 
@@ -1480,49 +1627,56 @@ class FabAccPol(object):
         except:
             status = 667
             return status
-        payload = {
-            "infraHPortS": {
-                "attributes": {
-                    "name": "%s" % port_name,
-                    "rn": "hports-%s-typ-range" % port_name,
-                    "status": "%s" % status,
+        payload = '''
+        {{
+            "infraHPortS": {{
+                "attributes": {{
+                    "name": "{port_name}",
+                    "rn": "hports-{port_name}-typ-range",
+                    "status": "{status}",
                     "type": "range"
-                },
+                }},
                 "children": [
-                    {
-                        "infraRsAccBaseGrp": {
-                            "attributes": {
+                    {{
+                        "infraRsAccBaseGrp": {{
+                            "attributes": {{
                                 "fexId": "101",
                                 "rn": "rsaccBaseGrp",
-                                "tDn": "uni/infra/funcprof/%s-%s" % (port_type, pol_group),
+                                "tDn": "uni/infra/funcprof/{port_type}-{pol_group}",
                                 "status": "created,modified"
-                            }
-                        }
-                    },
-                    {
-                        "infraPortBlk": {
-                            "attributes": {
-                                "fromCard": "%s" % mod_start,
-                                "toCard": "%s" % mod_end,
-                                "fromPort": "%s" % port_start,
-                                "toPort": "%s" % port_end,
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraPortBlk": {{
+                            "attributes": {{
+                                "fromCard": "{mod_start}",
+                                "toCard": "{mod_end}",
+                                "fromPort": "{port_start}",
+                                "toPort": "{port_end}",
                                 "name": "block2",
                                 "rn": "portblk-block2",
                                 "status": "created,modified"
-                            }
-                        }
-                    }
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(name=name, status=status, port_name=port_name,
+                   port_type=port_type, pol_group=pol_group,
+                   mod_start=mod_start, mod_end=mod_end, port_start=port_start,
+                   port_end=port_end)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/accportprof-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/accportprof-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("Interface Selector Failed to deploy. Exception: %s" % e)
+            print("Interface Selector Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -1531,40 +1685,44 @@ class FabAccPol(object):
     # status: created | created,modified | deleted
     # int_profile: Name of the Interface Profile to hook to Switch Selector
     def int_selector_sw_profile(self, name, status, int_profile):
-        payload = {
-            "infraNodeP": {
-                "attributes": {
-                    "dn": "uni/infra/nprof-%s" % name,
-                    "name": "%s" % name
-                },
+        payload = '''
+        {{
+            "infraNodeP": {{
+                "attributes": {{
+                    "dn": "uni/infra/nprof-{name}",
+                    "name": "{name}"
+                }},
                 "children": [
-                    {
-                        "infraLeafS": {
-                            "attributes": {
-                                "name": "%s" % name,
+                    {{
+                        "infraLeafS": {{
+                            "attributes": {{
+                                "name": "{name}",
                                 "type": "range"
-                            },
-                        }
-                    },
-                    {
-                        "infraRsAccPortP": {
-                            "attributes": {
-                                "tDn": "uni/infra/accportprof-%s" % int_profile,
-                                "status": "%s" % status
-                            }
-                        }
-                    }
+                            }}
+                        }}
+                    }},
+                    {{
+                        "infraRsAccPortP": {{
+                            "attributes": {{
+                                "tDn": "uni/infra/accportprof-{int_profile}",
+                                "status": "{status}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(name=name, status=status, int_profile=int_profile)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/infra/nprof-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/infra/nprof-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("Switch Profile Failed to deploy. Exception: %s" % e)
+            print("Switch Profile Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -1579,23 +1737,27 @@ class FabTnPol(object):
     # name: The name of the Tenant
     # status: created | created,modified | deleted
     def tenant(self, name, status):
-        payload = {
-            'fvTenant': {
-                'attributes': {
-                    'dn': 'uni/tn-%s' % name,
-                    'name': '%s' % name,
-                    'status': '%s' % status
-                }
-            }
-        }
+        payload = '''
+        {{
+            "fvTenant": {{
+                "attributes": {{
+                    "dn": "uni/tn-{name}",
+                    "name": "{name}",
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(name=name, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s.json'
-                       % (self.apic, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("Tenant Failed to deploy. Exception: %s" % e)
+            print("Tenant Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -1605,25 +1767,29 @@ class FabTnPol(object):
     # enforce: enforced | unenforced
     # status: created | created,modified | deleted
     def vrf(self, tn_name, name, enforce, status):
-        payload = {
-            'fvCtx': {
-                'attributes': {
-                    'dn': 'uni/tn-%s/ctx-%s' % (tn_name, name),
-                    'knwMcastAct': 'permit',
-                    'name': '%s' % name,
-                    'pcEnfPref': '%s' % enforce,
-                    'status': '%s' % status
-                },
-            }
-        }
+        payload = '''
+        {{
+            "fvCtx": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/ctx-{name}",
+                    "knwMcastAct": "permit",
+                    "name": "{name}",
+                    "pcEnfPref": "{enforce}",
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, enforce=enforce, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/ctx-%s.json'
-                       % (self.apic, tn_name, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/ctx-{}.json'
+                       .format(self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("VRF Failed to deploy. Exception: %s" % e)
+            print("VRF Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -1642,65 +1808,72 @@ class FabTnPol(object):
     # status: created | created,modified | deleted
     def bd(self, tn_name, name, arp, mdest, mcast, unicast, unk_unicast, vrf,
            l3_out, subnet, scope, status):
-        payload = {
-            'fvBD': {
-                'attributes': {
-                    'arpFlood': '%s' % arp,
-                    'dn': 'uni/tn-%s/BD-%s' % (tn_name, name),
-                    'epMoveDetectMode': '',
-                    'limitIpLearnToSubnets': 'no',
-                    'llAddr': '::',
-                    'mac': '00:22:BD:F8:19:FF',
-                    'multiDstPktAct': '%s' % mdest,
-                    'name': '%s' % name,
-                    'status': '%s' % status,
-                    'unicastRoute': '%s' % unicast,
-                    'unkMacUcastAct': '%s' % unk_unicast,
-                    'unkMcastAct': '%s' % mcast
-                },
-                'children': [
-                    {
-                        'fvRsBDToOut': {
-                            'attributes': {
-                                'rn': 'rsBDToOut-%s' % l3_out,
-                                'status': 'created,modified',
-                                'tnL3extOutName': '%s' % l3_out
-                            }
-                        }
-                    },
-                    {
-                        'fvRsCtx': {
-                            'attributes': {
-                                'rn': 'rsctx',
-                                'status': 'crated,modified',
-                                'tnFvCtxName': '%s' % vrf
-                            }
-                        }
-                    },
-                    {
-                        'fvSubnet': {
-                            'attributes': {
-                                'ctrl': '',
-                                'ip': '%s' % subnet,
-                                'name': '',
-                                'preferred': 'yes',
-                                'rn': 'subnet-[%s]' % subnet,
-                                'scope': '%s' % scope,
-                                'status': 'created,modified'
-                            }
-                        }
-                    }
+        payload = '''
+        {{
+            "fvBD": {{
+                "attributes": {{
+                    "arpFlood": "{arp}",
+                    "dn": "uni/tn-{tn_name}/BD-{name}",
+                    "epMoveDetectMode": "",
+                    "limitIpLearnToSubnets": "no",
+                    "llAddr": "::",
+                    "mac": "00:22:BD:F8:19:FF",
+                    "multiDstPktAct": "{mdest}",
+                    "name": "{name}",
+                    "status": "{status}",
+                    "unicastRoute": "{unicast}",
+                    "unkMacUcastAct": "{unk_unicast}",
+                    "unkMcastAct": "{mcast}"
+                }},
+                "children": [
+                    {{
+                        "fvRsBDToOut": {{
+                            "attributes": {{
+                                "rn": "rsBDToOut-{l3_out}",
+                                "status": "created,modified",
+                                "tnL3extOutName": "{l3_out}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "fvRsCtx": {{
+                            "attributes": {{
+                                "rn": "rsctx",
+                                "status": "crated,modified",
+                                "tnFvCtxName": "{vrf}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "fvSubnet": {{
+                            "attributes": {{
+                                "ctrl": "",
+                                "ip": "{subnet}",
+                                "name": "",
+                                "preferred": "yes",
+                                "rn": "subnet-[{subnet}]",
+                                "scope": "{scope}",
+                                "status": "created,modified"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, arp=arp, mdest=mdest,
+                   mcast=mcast, unicast=unicast, unk_unicast=unk_unicast,
+                   vrf=vrf, l3_out=l3_out, subnet=subnet, scope=scope,
+                   status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/BD-%s.json'
-                       % (self.apic, tn_name, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/BD-{}.json'
+                       .format(self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("BD Failed to deploy. Exception: %s" % e)
+            print("BD Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -1735,49 +1908,55 @@ class FabTnPol(object):
             except:
                 status = 667
                 return status
-        payload = {
-            'vzFilter': {
-                'attributes': {
-                    'dn': 'uni/tn-%s/flt-%s' % (tn_name, name),
-                    'name': '%s' % name,
-                    'status': '%s' % status
-                },
-                'children': [
-                    {
-                        'vzEntry': {
-                            'attributes': {
-                                'applyToFrag': 'no',
-                                'arpOpc': 'unspecified',
-                                'dFromPort': '%s' % dst_start,
-                                'dToPort': '%s' % dst_end,
-                                'etherT': '%s' % ethertype,
-                                'icmpv4T': 'unspecified',
-                                'icmpv6T': 'unspecified',
-                                'name': '%s' % name,
-                                'prot': '%s' % protocol,
-                                'rn': 'e-%s' % name,
-                                'sFromPort': '%s' % src_start,
-                                'sToPort': '%s' % src_end,
-                                'stateful': 'no',
-                                'status': '%s' % status,
-                                'tcpRules': ''
-                            }
-                        }
-                    },
+        payload = '''
+        {{
+            "vzFilter": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/flt-{name}",
+                    "name": "{name}",
+                    "status": "{status}"
+                }},
+                "children": [
+                    {{
+                        "vzEntry": {{
+                            "attributes": {{
+                                "applyToFrag": "no",
+                                "arpOpc": "unspecified",
+                                "dFromPort": "{dst_start}",
+                                "dToPort": "{dst_end}",
+                                "etherT": "{ethertype}",
+                                "icmpv4T": "unspecified",
+                                "icmpv6T": "unspecified",
+                                "name": "{name}",
+                                "prot": "{protocol}",
+                                "rn": "e-{name}",
+                                "sFromPort": "{src_start}",
+                                "sToPort": "{src_end}",
+                                "stateful": "no",
+                                "status": "{status}",
+                                "tcpRules": ""
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, dst_start=dst_start,
+                   dst_end=dst_end, src_start=src_start, src_end=src_end,
+                   ethertype=ethertype, protocol=protocol, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/flt-%s.json'
-                       % (self.apic, tn_name, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/flt-{}.json'
+                       .format(self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
             print("Filter Policy Failed to deploy. "
                   "Check your payload and URL.")
         except Exception as e:
-            print("Filter Failed to deploy. Exception: %s" % e)
+            print("Filter Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -1791,51 +1970,56 @@ class FabTnPol(object):
     # status: created | created,modified | deleted
     def contract(self, tn_name, name, scope, subject, filter, reverse_filter,
                  status):
-        payload = {
-            "vzBrCP": {
-                "attributes": {
-                    "dn": "uni/tn-%s/brc-%s" % (tn_name, name),
-                    "name": "%s" % name,
+        payload = '''
+        {{
+            "vzBrCP": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/brc-{name}",
+                    "name": "{name}",
                     "prio": "unspecified",
-                    "scope": "%s" % scope,
-                    "status": "%s" % status
-                },
+                    "scope": "{scope}",
+                    "status": "{status}"
+                }},
                 "children": [
-                    {
-                        "vzSubj": {
-                            "attributes": {
+                    {{
+                        "vzSubj": {{
+                            "attributes": {{
                                 "consMatchT": "AtleastOne",
-                                "name": "%s" % subject,
+                                "name": "{subject}",
                                 "prio": "unspecified",
                                 "provMatchT": "AtleastOne",
-                                "revFltPorts": "%s" % reverse_filter,
-                                "rn": "subj-%s" % subject,
-                                "status": "%s" % status
-                            },
+                                "revFltPorts": "{reverse_filter}",
+                                "rn": "subj-{subject}",
+                                "status": "{status}"
+                            }},
                             "children": [
-                                {
-                                    "vzRsSubjFiltAtt": {
-                                        "attributes": {
-                                            "rn": "rssubjFiltAtt-%s" % filter,
-                                            "status": "%s" % status,
-                                            "tnVzFilterName": "%s" % filter
-                                        }
-                                    }
-                                }
+                                {{
+                                    "vzRsSubjFiltAtt": {{
+                                        "attributes": {{
+                                            "rn": "rssubjFiltAtt-{filter}",
+                                            "status": "{status}",
+                                            "tnVzFilterName": "{filter}"
+                                        }}
+                                    }}
+                                }}
                             ]
-                        }
-                    }
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, scope=scope, subject=subject,
+                   filter=filter, reverse_filter=reverse_filter, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/brc-%s.json'
-                       % (self.apic, tn_name, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/brc-{}.json'
+                       .format(self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("Contract Failed to deploy. Exception: %s" % e)
+            print("Contract Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -1844,23 +2028,27 @@ class FabTnPol(object):
     # name: Name of the Application Profile
     # status: created | created,modified | deleted
     def app_profile(self, tn_name, name, status):
-        payload = {
-            "fvAp": {
-                "attributes": {
-                    "dn": "uni/tn-%s/ap-%s" % (tn_name, name),
-                    "name": "%s" % name,
-                    "status": "%s" % status
-                }
-            }
-        }
+        payload = '''
+        {{
+            "fvAp": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/ap-{name}",
+                    "name": "{name}",
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/ap-%s.json'
-                       % (self.apic, tn_name, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/ap-{}.json'
+                       .format(self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("App Profile failed to deploy. Exception: %s" % e)
+            print("App Profile failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -1871,35 +2059,40 @@ class FabTnPol(object):
     # bd: Name of associated BD
     # status: created | created,modified | deleted
     def epg(self, tn_name, ap_name, name, bd, status):
-        payload = {
-            "fvAEPg": {
-                "attributes": {
-                    "dn": "uni/tn-%s/ap-%s/epg-%s" % (tn_name, ap_name, name),
-                    "name": "%s" % name,
-                    "rn": "epg-%s" % name,
-                    "status": "%s" % status
-                },
+        payload = '''
+        {{
+            "fvAEPg": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/ap-{ap_name}/epg-{name}",
+                    "name": "{name}",
+                    "rn": "epg-{name}",
+                    "status": "{status}"
+                }},
                 "children": [
-                    {
-                        "fvRsBd": {
-                            "attributes": {
-                                "tnFvBDName": "%s" % bd,
-                                "status": "%s" % status
-                            },
-                        }
-                    },
+                    {{
+                        "fvRsBd": {{
+                            "attributes": {{
+                                "tnFvBDName": "{bd}",
+                                "status": "{status}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, ap_name=ap_name, name=name, bd=bd,
+                   status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/ap-%s/epg-%s.json'
-                       % (self.apic, tn_name, ap_name, name),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/ap-{}/epg-{}.json'
+                       .format(self.apic, tn_name, ap_name, name),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
         except Exception as e:
-            print("EPG failed to deploy. Exception: %s" % e)
+            print("EPG failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -1913,26 +2106,32 @@ class FabTnPol(object):
     # status: created | created,modified | deleted
     def epg_phys_dom(self, tn_name, ap_name, epg_name, phys_dom, deploy,
                      resolve, status):
-        payload = {
-            "fvRsDomAtt": {
-                "attributes": {
+        payload = '''
+        {{
+            "fvRsDomAtt": {{
+                "attributes": {{
                     "childAction": "",
-                    "dn": "uni/tn-%s/ap-%s/epg-%s/rsdomAtt-[uni/phys-%s]" % (tn_name, ap_name, epg_name, phys_dom),
-                    "instrImedcy": "%s" % deploy,
-                    "resImedcy": "%s" % resolve,
-                    "status": "%s" % status
-                }
-            }
-        }
+                    "dn": "uni/tn-{tn_name}/ap-{ap_name}/epg-{epg_name}/rsdomAtt-[uni/phys-{epg_name}]",
+                    "instrImedcy": "{deploy}",
+                    "resImedcy": "{resolve}",
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(tn_name=tn_name, ap_name=ap_name, epg_name=epg_name,
+                   phys_dom=phys_dom, deploy=deploy, resolve=resolve,
+                   status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/ap-%s/epg-%s/rsdomAtt-[uni/phys-%s].json'
-                       % (self.apic, tn_name, ap_name, epg_name, phys_dom),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/ap-{}/epg-{}.json'
+                       .format(self.apic, tn_name, ap_name, epg_name),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
         except Exception as e:
-            print("EPG to Phys Dom failed to deploy. Exception: %s" % e)
+            print("EPG to Phys Dom failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -1946,40 +2145,46 @@ class FabTnPol(object):
     # status: created | created,modified | deleted
     def epg_vmm_dom(self, tn_name, ap_name, epg_name, vmm_dom, deploy,
                     resolve, status):
-        payload = {
-            "fvRsDomAtt": {
-                "attributes": {
+        payload = '''
+        {{
+            "fvRsDomAtt": {{
+                "attributes": {{
                     "childAction": "",
-                    "dn": "uni/tn-%s/ap-%s/epg-%s/rsdomAtt-[uni/vmmp-VMware/dom-%s]" % (tn_name, ap_name, epg_name, vmm_dom),
-                    "instrImedcy": "%s" % deploy,
-                    "resImedcy": "%s" % resolve,
-                    "status": "%s" % status,
-                    "tDn": "uni/vmmp-VMware/dom-%s" % (vmm_dom)
-                },
+                    "dn": "uni/tn-{tn_name}/ap-{ap_name}/epg-{epg_name}/rsdomAtt-[uni/vmmp-VMware/dom-{vmm_dom}]",
+                    "instrImedcy": "{deploy}",
+                    "resImedcy": "{resolve}",
+                    "status": "{status}",
+                    "tDn": "uni/vmmp-VMware/dom-{vmm_dom}"
+                }},
                 "children": [
-                    {
-                        "vmmSecP": {
-                            "attributes": {
+                    {{
+                        "vmmSecP": {{
+                            "attributes": {{
                                 "allowPromiscuous": "reject",
                                 "forgedTransmits": "reject",
                                 "macChanges": "reject",
                                 "rn": "sec",
                                 "status": "created,modified"
-                            }
-                        }
-                    }
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, ap_name=ap_name, epg_name=epg_name,
+                   vmm_dom=vmm_dom, deploy=deploy, resolve=resolve,
+                   status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/ap-%s/epg-%s.json'
-                       % (self.apic, tn_name, ap_name, epg_name),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/ap-{}/epg-{}.json'
+                       .format(self.apic, tn_name, ap_name, epg_name),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
         except Exception as e:
-            print("EPG to VMM Dom failed to deploy. Exception: %s" % e)
+            print("EPG to VMM Dom failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -1990,24 +2195,29 @@ class FabTnPol(object):
     # contract: Name of the Contract
     # status: created | created,modified | deleted
     def provide_contract(self, tn_name, ap_name, epg_name, contract, status):
-        payload = {
-            "fvRsProv": {
-                "attributes": {
-                    "dn": "uni/tn-%s/ap-%s/epg-%s/rsprov-%s" % (tn_name, ap_name, epg_name, contract),
+        payload = '''
+        {{
+            "fvRsProv": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/ap-{ap_name}/epg-{epg_name}/rsprov-{contract}",
                     "prio": "unspecified",
-                    "status": "%s" % status,
-                    "tnVzBrCPName": "%s" % contract
-                }
-            }
-        }
+                    "status": "{status}",
+                    "tnVzBrCPName": "{contract}"
+                }}
+            }}
+        }}
+        '''.format(tn_name=tn_name, ap_name=ap_name, epg_name=epg_name,
+                   contract=contract, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/ap-%s/epg-%s/rsprov-%s.json'
-                       % (self.apic, tn_name, ap_name, epg_name, contract), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/ap-{}/epg-{}/rsprov-{}.json'
+                       .format(self.apic, tn_name, ap_name, epg_name, contract), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("Provide Contract failed to deploy. Exception: %s" % e)
+            print("Provide Contract failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -2018,25 +2228,30 @@ class FabTnPol(object):
     # contract: Name of the Contract
     # status: created | created,modified | deleted
     def consume_contract(self, tn_name, ap_name, epg_name, contract, status):
-        payload = {
-            "fvRsCons": {
-                "attributes": {
-                    "dn": "uni/tn-%s/ap-%s/epg-%s/rscons-%s" % (tn_name, ap_name, epg_name, contract),
+        payload = '''
+        {{
+            "fvRsCons": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/ap-{ap_name}/epg-{epg_name}/rscons-{contract}",
                     "prio": "unspecified",
-                    "status": "%s" % status,
-                    "tnVzBrCPName": "%s" % contract
-                }
-            }
-        }
+                    "status": "{status}",
+                    "tnVzBrCPName": "{contract}"
+                }}
+            }}
+        }}
+        '''.format(tn_name=tn_name, ap_name=ap_name, epg_name=epg_name,
+                   contract=contract, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/ap-%s/epg-%s/rscons-%s.json'
-                       % (self.apic, tn_name, ap_name, epg_name, contract),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/ap-{}/epg-{}/rscons-{}.json'
+                       .format(self.apic, tn_name, ap_name, epg_name, contract),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
         except Exception as e:
-            print("Consume Contract failed to deploy. Exception: %s" % e)
+            print("Consume Contract failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -2059,38 +2274,44 @@ class FabTnPol(object):
         except:
             status = 667
             return status
-        payload = {
-            "fvAEPg": {
-                "attributes": {
-                    "dn": "uni/tn-%s/ap-%s/epg-%s" % (tn_name, ap_name, epg_name),
-                    "name": "%s" % epg_name,
-                    "rn": "epg-%s" % epg_name,
+        payload = '''
+        {{
+            "fvAEPg": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/ap-{ap_name}/epg-{epg_name}",
+                    "name": "{epg_name}",
+                    "rn": "epg-{epg_name}",
                     "status": "created,modified"
-                },
+                }},
                 "children": [
-                    {
-                        "fvRsPathAtt": {
-                            "attributes": {
-                                "tDn": "topology/pod-1/protpaths-%s-%s/pathep-[%s]" % (sw1, sw2, vpc),
-                                "encap": "vlan-%s" % encap,
-                                "instrImedcy": "%s" % deploy,
-                                "status": "%s" % status
-                            },
-                        }
-                    }
+                    {{
+                        "fvRsPathAtt": {{
+                            "attributes": {{
+                                "tDn": "topology/pod-1/protpaths-{sw1}-{sw2}/pathep-[{vpc}]",
+                                "encap": "vlan-{encap}",
+                                "instrImedcy": "{deploy}",
+                                "status": "{status}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, ap_name=ap_name, epg_name=epg_name,
+                   sw1=sw1, sw2=sw2, vpc=vpc, encap=encap, deploy=deploy,
+                   status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/ap-%s/epg-%s.json'
-                       % (self.apic, tn_name, ap_name, epg_name),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/ap-{}/epg-{}.json'
+                       .format(self.apic, tn_name, ap_name, epg_name),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
         except Exception as e:
-            print("Static path binding (vPC) failed to deploy. Exception: %s"
-                  % e)
+            print("Static path binding (vPC) failed to deploy. Exception: {}"
+                  .format(e))
             status = 666
         return status
 
@@ -2111,38 +2332,44 @@ class FabTnPol(object):
         except:
             status = 667
             return status
-        payload = {
-            "fvAEPg": {
-                "attributes": {
-                    "dn": "uni/tn-%s/ap-%s/epg-%s" % (tn_name, ap_name, epg_name),
-                    "name": "%s" % epg_name,
-                    "rn": "epg-%s" % epg_name,
+        payload = '''
+        {{
+            "fvAEPg": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/ap-{ap_name}/epg-{epg_name}",
+                    "name": "{epg_name}",
+                    "rn": "epg-{epg_name}",
                     "status": "created,modified"
-                },
+                }},
                 "children": [
-                    {
-                        "fvRsPathAtt": {
-                            "attributes": {
-                                "dn": "uni/tn-%s/ap-%s/epg-%s/rspathAtt-[topology/pod-1/paths-%s/pathep-[eth1/%s]]" % (tn_name, ap_name, epg_name, sw1, port),
-                                "encap": "vlan-%s" % encap,
-                                "instrImedcy": "%s" % deploy,
-                                "status": "%s" % status
-                            }
-                        }
-                    }
+                    {{
+                        "fvRsPathAtt": {{
+                            "attributes": {{
+                                "dn": "uni/tn-{tn_name}/ap-{ap_name}/epg-{epg_name}/rspathAtt-[topology/pod-1/paths-{sw1}/pathep-[eth1/{port}]]",
+                                "encap": "vlan-{encap}",
+                                "instrImedcy": "{deploy}",
+                                "status": "{status}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, ap_name=ap_name, epg_name=epg_name,
+                  sw1=sw1, port=port, encap=encap, deploy=deploy,
+                  status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/ap-%s/epg-%s.json'
-                       % (self.apic, tn_name, ap_name, epg_name),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/ap-{}/epg-{}.json'
+                       .format(self.apic, tn_name, ap_name, epg_name),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
         except Exception as e:
             print("Static path binding (access) failed to deploy. Exception: "
-                  "%s" % e)
+                  "{}".format(e))
             status = 666
         return status
 
@@ -2156,36 +2383,42 @@ class FabTnPol(object):
     # l3_network: Name of the L3 out Network used to reach DHCP server
     # status: created | created,modified | deleted
     def dhcp_relay(self, tn_name, relay_name, dhcp_ip, l3_tn, l3_out, l3_network, status):
-        payload = {
-            "dhcpRelayP": {
-                "attributes": {
-                    "dn": "uni/tn-%s/relayp-%s" % (tn_name, relay_name),
-                    "name": "%s" % relay_name,
-                    "status": "%s" % status
-                },
+        payload = '''
+        {{
+            "dhcpRelayP": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/relayp-{relay_name}",
+                    "name": "{relay_name}",
+                    "status": "{status}"
+                }},
                 "children": [
-                    {
-                        "dhcpRsProv": {
-                            "attributes": {
-                                "addr": "%s" % dhcp_ip,
-                                "rn": "rsprov-[uni/tn-%s/out-%s/instP-%s]" % (l3_tn, l3_out, l3_network),
-                                "status": "%s" % status
-                            },
-                        }
-                    },
+                    {{
+                        "dhcpRsProv": {{
+                            "attributes": {{
+                                "addr": "{dhcp_ip}",
+                                "rn": "rsprov-[uni/tn-{l3_tn}/out-{l3_out}/instP-{l3_network}]",
+                                "status": "{status}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, relay_name=relay_name, dhcp_ip=dhcp_ip,
+                   l3_tn=l3_tn, l3_out=l3_out, l3_network=l3_network,
+                   status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/relayp-%s.json'
-                       % (self.apic, tn_name, relay_name),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/relayp-{}.json'
+                       .format(self.apic, tn_name, relay_name),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
         except Exception as e:
             print("DHCP Relay failed to deploy. Exception: "
-                  "%s" % e)
+                  "{}".format(e))
             status = 666
         return status
 
@@ -2196,26 +2429,31 @@ class FabTnPol(object):
     # status: created | created,modified | deleted
     # scope (optional): infra | tenant, defaults to tenant
     def dhcp_label(self, tn_name, bd_name, relay_name, scope, status):
-        payload = {
-            "dhcpLbl": {
-                "attributes": {
-                    "dn": "uni/tn-%s/BD-%s/dhcplbl-%s" % (tn_name, bd_name, relay_name),
-                    "name": "%s" % relay_name,
-                    "owner": "%s" % scope,
-                    "status": "%s" % status
-                }
-            }
-        }
+        payload = '''
+        {{
+            "dhcpLbl": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/BD-{bd_name}/dhcplbl-{relay_name}",
+                    "name": "{relay_name}",
+                    "owner": "{scope}",
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(tn_name=tn_name, bd_name=bd_name, relay_name=relay_name,
+                   scope=scope, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/BD-%s.json'
-                       % (self.apic, tn_name, bd_name),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/BD-{}.json'
+                       .format(self.apic, tn_name, bd_name),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
         except Exception as e:
             print("DHCP Label failed to deploy. Exception: "
-                  "%s" % e)
+                  "{}".format(e))
             status = 666
         return status
 
@@ -2233,44 +2471,50 @@ class FabL3Pol(object):
     # vrf: Name of associated VRF
     # status: created | created,modified | deleted
     def l3_out(self, tn_name, name, domain, vrf, status):
-        payload = {
-            "l3extOut": {
-                "attributes": {
+        payload = '''
+        {{
+            "l3extOut": {{
+                "attributes": {{
                     "enforceRtctrl": "export",
-                    "name": "%s" % name,
-                    "status": "%s" % status,
+                    "name": "{name}",
+                    "status": "{status}",
                     "targetDscp": "unspecified"
-                },
+                }},
                 "children": [
-                    {
-                        "l3extRsEctx": {
-                            "attributes": {
+                    {{
+                        "l3extRsEctx": {{
+                            "attributes": {{
                                 "rn": "rsectx",
-                                "status": "%s" % status,
-                                "tnFvCtxName": "%s" % vrf
-                            }
-                        }
-                    },
-                    {
-                        "l3extRsL3DomAtt": {
-                            "attributes": {
+                                "status": "{status}",
+                                "tnFvCtxName": "{vrf}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "l3extRsL3DomAtt": {{
+                            "attributes": {{
                                 "rn": "rsl3DomAtt",
-                                "status": "%s" % status,
-                                "tDn": "uni/l3dom-%s" % domain
-                            }
-                        }
-                    }
+                                "status": "{status}",
+                                "tDn": "uni/l3dom-{domain}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, domain=domain, vrf=vrf,
+                   status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/out-%s.json'
-                       % (self.apic, tn_name, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}.json'
+                       .format(self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("L3 Out (initial setup) Failed to deploy. Exception: %s" % e)
+            print("L3 Out (initial setup) Failed to deploy. Exception: {}"
+                  .format(e))
             status = 666
         return status
 
@@ -2282,38 +2526,43 @@ class FabL3Pol(object):
     # vrf: Name of associated VRF
     # status: created | created,modified | deleted
     def ospf(self, tn_name, name, area, area_type, status):
-        payload = {
-            "l3extOut": {
-                "attributes": {
-                    "dn": "uni/tn-%s/out-%s" % (tn_name, name),
+        payload = '''
+        {{
+            "l3extOut": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/out-{name}",
                     "enforceRtctrl": "export",
-                    "name": "%s" % name,
+                    "name": "{name}",
                     "status": "created,modified"
-                },
+                }},
                 "children": [
-                    {
-                        "ospfExtP": {
-                            "attributes": {
+                    {{
+                        "ospfExtP": {{
+                            "attributes": {{
                                 "areaCost": "1",
                                 "areaCtrl": "redistribute,summary",
-                                "areaId": "%s" % area,
-                                "areaType": "%s" % area_type,
+                                "areaId": "{area}",
+                                "areaType": "{area_type}",
                                 "rn": "ospfExtP",
-                                "status": "%s" % status
-                            }
-                        }
-                    }
+                                "status": "{status}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, area=area, area_type=area_type,
+                   status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/out-%s.json'
-                       % (self.apic, tn_name, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}.json'
+                       .format(self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("L3 Out (OSPF) Failed to deploy. Exception: %s" % e)
+            print("L3 Out (OSPF) Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -2322,34 +2571,38 @@ class FabL3Pol(object):
     # name: The name of the L3-Out
     # status: created | created,modified | deleted (of the BGP process)
     def bgp(self, tn_name, name, status):
-        payload = {
-            "l3extOut": {
-                "attributes": {
-                    "dn": "uni/tn-%s/out-%s" % (tn_name, name),
+        payload = '''
+        {{
+            "l3extOut": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/out-{name}",
                     "enforceRtctrl": "export",
-                    "name": "%s" % name,
+                    "name": "{name}",
                     "status": "created,modified"
-                },
+                }},
                 "children": [
-                    {
-                        "bgpExtP": {
-                            "attributes": {
+                    {{
+                        "bgpExtP": {{
+                            "attributes": {{
                                 "rn": "bgpExtP",
-                                "status": "%s" % status
-                            }
-                        }
-                    }
+                                "status": "{status}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/out-%s.json'
-                       % (self.apic, tn_name, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}.json'
+                       .format(self.apic, tn_name, name), data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("L3 Out (BGP) Failed to deploy. Exception: %s" % e)
+            print("L3 Out (BGP) Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -2371,69 +2624,76 @@ class FabL3Pol(object):
         except:
             status = 667
             return status
-        payload = {
-            "l3extLNodeP": {
-                "attributes": {
-                    "dn": "uni/tn-%s/out-%s/lnodep-%s" % (tn_name, name, node_name),
-                    "name": "%s" % node_name,
-                    "status": "%s" % status,
+        payload = '''
+        {{
+            "l3extLNodeP": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/out-{name}/lnodep-{node_name}",
+                    "name": "{node_name}",
+                    "status": "{status}",
                     "tag": "yellow-green",
                     "targetDscp": "unspecified"
-                },
+                }},
                 "children": [
-                    {
-                        "l3extRsNodeL3OutAtt": {
-                            "attributes": {
-                                "rn": "rsnodeL3OutAtt-[topology/pod-1/node-%s]" % sw1,
-                                "rtrId": "%s" % sw1_loop,
-                                "rtrIdLoopBack": "%s" % loopback,
+                    {{
+                        "l3extRsNodeL3OutAtt": {{
+                            "attributes": {{
+                                "rn": "rsnodeL3OutAtt-[topology/pod-1/node-{sw1}]",
+                                "rtrId": "{sw1_loop}",
+                                "rtrIdLoopBack": "{loopback}",
                                 "status": "created,modified"
-                            },
+                            }},
                             "children": [
-                                {
-                                    "l3extLoopBackIfP": {
-                                        "attributes": {
-                                            "addr": "%s" % sw1_loop,
-                                            "rn": "lbp-[%s]" % sw1_loop,
+                                {{
+                                    "l3extLoopBackIfP": {{
+                                        "attributes": {{
+                                            "addr": "{sw1_loop}",
+                                            "rn": "lbp-[{sw1_loop}]",
                                             "status": "created,modified"
-                                        }
-                                    }
-                                }
+                                        }}
+                                    }}
+                                }}
                             ]
-                        }
-                    },
-                    {
-                        "l3extRsNodeL3OutAtt": {
-                            "attributes": {
-                                "rn": "rsnodeL3OutAtt-[topology/pod-1/node-%s]" % sw2,
-                                "rtrId": "%s" % sw2_loop,
-                                "rtrIdLoopBack": "%s" % loopback,
+                        }}
+                    }},
+                    {{
+                        "l3extRsNodeL3OutAtt": {{
+                            "attributes": {{
+                                "rn": "rsnodeL3OutAtt-[topology/pod-1/node-{sw2}]",
+                                "rtrId": "{sw2_loop}",
+                                "rtrIdLoopBack": "{loopback}",
                                 "status": "created,modified"
-                            },
+                            }},
                             "children": [
-                                {
-                                    "l3extLoopBackIfP": {
-                                        "attributes": {
-                                            "addr": "%s" % sw2_loop,
-                                            "rn": "lbp-[%s]" % sw2_loop,
+                                {{
+                                    "l3extLoopBackIfP": {{
+                                        "attributes": {{
+                                            "addr": "{sw2_loop}",
+                                            "rn": "lbp-[{sw2_loop}]",
                                             "status": "created,modified"
-                                        }
-                                    }
-                                }
+                                        }}
+                                    }}
+                                }}
                             ]
-                        }
-                    }
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, node_name=node_name, sw1=sw1,
+                   sw2=sw2, sw1_loop=sw1_loop, sw2_loop=sw2_loop,
+                   loopback=loopback, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/out-%s.json'
-                       % (self.apic, tn_name, name), data=json.dumps(payload),
-                       cookies=self.cookies, verify=False)
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}.json'
+                       .format(self.apic, tn_name, name),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
             status = r.status_code
         except Exception as e:
-            print("L3 Out (Node Profile) Failed to deploy. Exception: %s" % e)
+            print("L3 Out (Node Profile) Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -2452,46 +2712,53 @@ class FabL3Pol(object):
         except:
             status = 667
             return status
-        payload = {
-            "l3extRsNodeL3OutAtt": {
-                "attributes": {
-                    "dn": "uni/tn-%s/out-%s/lnodep-%s/rsnodeL3OutAtt-[topology/pod-1/node-%s]" % (tn_name, name, node_name, sw),
+        payload = '''
+        {{
+            "l3extRsNodeL3OutAtt": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/out-{name}/lnodep-{node_name}/rsnodeL3OutAtt-[topology/pod-1/node-{sw}]",
                     "status": "created,modified"
-                },
+                }},
                 "children": [
-                    {
-                        "ipRouteP": {
-                            "attributes": {
+                    {{
+                        "ipRouteP": {{
+                            "attributes": {{
                                 "aggregate": "no",
-                                "ip": "%s" % prefix,
+                                "ip": "{prefix}",
                                 "pref": "1",
-                                "rn": "rt-[%s]" % prefix,
-                                "status": "%s" % status
-                            },
+                                "rn": "rt-[{prefix}]",
+                                "status": "{status}"
+                            }},
                             "children": [
-                                {
-                                    "ipNexthopP": {
-                                        "attributes": {
-                                            "nhAddr": "%s" % next_hop,
-                                            "rn": "nh-[%s]" % next_hop,
-                                            "status": "%s" % status
-                                        }
-                                    }
-                                }
+                                {{
+                                    "ipNexthopP": {{
+                                        "attributes": {{
+                                            "nhAddr": "{next_hop}",
+                                            "rn": "nh-[{next_hop}]",
+                                            "status": "{status}"
+                                        }}
+                                    }}
+                                }}
                             ]
-                        }
-                    }
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, node_name=node_name, sw=sw,
+                   prefix=prefix, next_hop=next_hop, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/out-%s.json'
-                       % (self.apic, tn_name, name), data=json.dumps(payload),
-                       cookies=self.cookies, verify=False)
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}.json'
+                       .format(self.apic, tn_name, name),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
             status = r.status_code
         except Exception as e:
-            print("L3 Out (Static Route) Failed to deploy. Exception: %s" % e)
+            print("L3 Out (Static Route) Failed to deploy. Exception: {}"
+                  .format(e))
             status = 666
         return status
 
@@ -2513,48 +2780,55 @@ class FabL3Pol(object):
         except:
             status = 667
             return status
-        payload = {
-            "l3extLIfP": {
-                "attributes": {
-                    "dn": "uni/tn-%s/out-%s/lnodep-%s/lifp-%s" % (tn_name, name, node_name, int_profile),
-                    "name": "%s" % int_profile,
-                    "status": "%s" % int_profile_status
-                },
+        payload = '''
+        {{
+            "l3extLIfP": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/out-{name}/lnodep-{node_name}/lifp-{int_profile}",
+                    "name": "{int_profile}",
+                    "status": "{int_profile_status}"
+                }},
                 "children": [
-                    {
-                        "l3extRsNdIfPol": {
-                            "attributes": {
+                    {{
+                        "l3extRsNdIfPol": {{
+                            "attributes": {{
                                 "status": "created,modified"
-                            }
-                        }
-                    },
-                    {
-                        "l3extRsPathL3OutAtt": {
-                            "attributes": {
-                                "addr": "%s" % ip,
+                            }}
+                        }}
+                    }},
+                    {{
+                        "l3extRsPathL3OutAtt": {{
+                            "attributes": {{
+                                "addr": "{ip}",
                                 "encap": "unknown",
                                 "ifInstT": "l3-port",
                                 "llAddr": "::",
                                 "mac": "00:22:BD:F8:19:FF",
                                 "mode": "regular",
                                 "mtu": "inherit",
-                                "rn": "rspathL3OutAtt-[topology/pod-1/paths-%s/pathep-[eth1/%s]]" % (sw, port),
-                                "status": "%s" % status,
-                            }
-                        }
-                    }
+                                "rn": "rspathL3OutAtt-[topology/pod-1/paths-{sw}/pathep-[eth1/{port}]]",
+                                "status": "{status}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, node_name=node_name,
+                   int_profile=int_profile, sw=sw, port=port, ip=ip,
+                   int_profile_status=int_profile_status, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/out-%s/lnodep-%s/lifp-%s.json'
-                       % (self.apic, tn_name, name, node_name, int_profile),
-                       data=json.dumps(payload), cookies=self.cookies,
-                       verify=False)
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}/lnodep-{}/lifp-{}.json'
+                       .format(self.apic, tn_name, name, node_name,
+                        int_profile), data=json.dumps(payload),
+                       cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("L3 Out (Routed Ints) Failed to deploy. Exception: %s" % e)
+            print("L3 Out (Routed Ints) Failed to deploy. Exception: {}"
+                  .format(e))
             status = 666
         return status
 
@@ -2578,48 +2852,55 @@ class FabL3Pol(object):
         except:
             status = 667
             return status
-        payload = {
-            "l3extLIfP": {
-                "attributes": {
-                    "dn": "uni/tn-%s/out-%s/lnodep-%s/lifp-%s" % (tn_name, name, node_name, int_profile),
-                    "name": "%s" % int_profile,
-                    "status": "%s" % int_profile_status
-                },
+        payload = '''
+        {{
+            "l3extLIfP": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/out-{name}/lnodep-{node_name}/lifp-{int_profile}",
+                    "name": "{int_profile}",
+                    "status": "{int_profile_status}"
+                }},
                 "children": [
-                    {
-                        "l3extRsNdIfPol": {
-                            "attributes": {
+                    {{
+                        "l3extRsNdIfPol": {{
+                            "attributes": {{
                             "status": "created,modified"
-                            }
-                        }
-                    },
-                    {
-                        "l3extRsPathL3OutAtt": {
-                            "attributes": {
-                                "addr": "%s" % ip,
-                                "encap": "vlan-%s" % vlan,
+                            }}
+                        }}
+                    }},
+                    {{
+                        "l3extRsPathL3OutAtt": {{
+                            "attributes": {{
+                                "addr": "{ip}",
+                                "encap": "vlan-{vlan}",
                                 "ifInstT": "sub-interface",
                                 "llAddr": "::",
                                 "mac": "00:22:BD:F8:19:FF",
                                 "mode": "regular",
                                 "mtu": "inherit",
-                                "rn": "rspathL3OutAtt-[topology/pod-1/paths-%s/pathep-[eth1/%s]]" % (sw, port),
-                                "status": "%s" % status,
-                            }
-                        }
-                    }
+                                "rn": "rspathL3OutAtt-[topology/pod-1/paths-{sw}/pathep-[eth1/{port}]]",
+                                "status": "{status}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, node_name=node_name,
+                   int_profile=int_profile, sw=sw, port=port, vlan=vlan,
+                   ip=ip, int_profile_status=int_profile_status, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/out-%s/lnodep-%s/lifp-%s.json'
-                       % (self.apic, tn_name, name, node_name, int_profile),
-                       data=json.dumps(payload), cookies=self.cookies,
-                       verify=False)
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}/lnodep-{}/lifp'
+                       '-{}.json'.format(self.apic, tn_name, name, node_name,
+                       int_profile), data=json.dumps(payload),
+                       cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("L3 Out (Routed Ints) Failed to deploy. Exception: %s" % e)
+            print("L3 Out (Routed Ints) Failed to deploy. Exception: {}"
+                  .format(e))
             status = 666
         return status
 
@@ -2645,72 +2926,79 @@ class FabL3Pol(object):
         except:
             status = 667
             return status
-        payload = {
-            "l3extLIfP": {
-                "attributes": {
-                    "dn": "uni/tn-%s/out-%s/lnodep-%s/lifp-%s" % (tn_name, name, node_name, int_profile),
-                    "name": "%s" % int_profile,
-                    "status": "%s" % int_profile_status
-                },
+        payload = '''
+        {{
+            "l3extLIfP": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/out-{name}/lnodep-{node_name}/lifp-{int_profile}",
+                    "name": "{int_profile}",
+                    "status": "{int_profile_status}"
+                }},
                 "children": [
-                    {
-                        "l3extRsNdIfPol": {
-                            "attributes": {
+                    {{
+                        "l3extRsNdIfPol": {{
+                            "attributes": {{
                                 "status": "created,modified"
-                            }
-                        }
-                    },
-                    {
-                        "l3extRsPathL3OutAtt": {
-                            "attributes": {
-                                "encap": "vlan-%s" % vlan,
+                            }}
+                        }}
+                    }},
+                    {{
+                        "l3extRsPathL3OutAtt": {{
+                            "attributes": {{
+                                "encap": "vlan-{vlan}",
                                 "ifInstT": "ext-svi",
                                 "llAddr": "::",
                                 "mac": "00:22:BD:F8:19:FF",
                                 "mode": "regular",
                                 "mtu": "inherit",
-                                "status": "%s" % status,
-                                "tDn": "topology/pod-1/protpaths-%s-%s/pathep-[%s]" % (sw1, sw2, vpc),
+                                "status": "{status}",
+                                "tDn": "topology/pod-1/protpaths-{sw1}-{sw2}/pathep-[{vpc}]",
                                 "targetDscp": "unspecified"
-                            },
+                            }},
                             "children": [
-                                {
-                                    "l3extMember": {
-                                        "attributes": {
-                                            "addr": "%s" % sw2_ip,
+                                {{
+                                    "l3extMember": {{
+                                        "attributes": {{
+                                            "addr": "{sw2_ip}",
                                             "llAddr": "::",
                                             "rn": "mem-B",
                                             "side": "B",
                                             "status": "created,modified"
-                                        }
-                                    }
-                                },
-                                {
-                                    "l3extMember": {
-                                        "attributes": {
-                                            "addr": "%s" % sw1_ip,
+                                        }}
+                                    }}
+                                }},
+                                {{
+                                    "l3extMember": {{
+                                        "attributes": {{
+                                            "addr": "{sw1_ip}",
                                             "llAddr": "::",
                                             "rn": "mem-A",
                                             "side": "A",
                                             "status": "created,modified"
-                                        }
-                                    }
-                                }
+                                        }}
+                                    }}
+                                }}
                             ]
-                        }
-                    }
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, node_name=node_name,
+                   int_profile=int_profile, sw1=sw1, sw2=sw2, sw1_ip=sw1_ip,
+                   sw2_ip=sw2_ip, vlan=vlan, vpc=vpc,
+                   int_profile_status=int_profile_status, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/out-%s/lnodep-%s/lifp-%s.json'
-                       % (self.apic, tn_name, name, node_name, int_profile),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}/lnodep-{}/lifp-{}.json'
+                       .format(self.apic, tn_name, name, node_name, int_profile),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
         except Exception as e:
-            print("L3 Out (SVIs) Failed to deploy. Exception: %s" % e)
+            print("L3 Out (SVIs) Failed to deploy. Exception: {}".format(e))
             status = 666
         return status
 
@@ -2723,56 +3011,61 @@ class FabL3Pol(object):
     # subnet_status created | created,modified | deleted of the subnet
     def network_epg(self, tn_name, name, epg_name, subnet, status,
                     subnet_status):
-        payload = {
-            "l3extInstP": {
-                "attributes": {
-                    "dn": "uni/tn-%s/out-%s/instP-%s" % (tn_name, name, epg_name),
+        payload = '''
+        {{
+            "l3extInstP": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/out-{name}/instP-{epg_name}",
                     "matchT": "AtleastOne",
-                    "name": "%s" % epg_name,
-                    "status": "%s" % status
-                },
+                    "name": "{epg_name}",
+                    "status": "{status}"
+                }},
                 "children": [
-                    {
-                        "l3extConfigOutDef": {
-                            "attributes": {
+                    {{
+                        "l3extConfigOutDef": {{
+                            "attributes": {{
                                 "rn": "configOutDef",
                                 "status": "created,modified"
-                            }
-                        }
-                    },
-                    {
-                        "l3extSubnet": {
-                            "attributes": {
+                            }}
+                        }}
+                    }},
+                    {{
+                        "l3extSubnet": {{
+                            "attributes": {{
                                 "aggregate": "",
-                                "ip": "%s" % subnet,
+                                "ip": "{subnet}",
                                 "name": "",
-                                "rn": "extsubnet-[%s]" % subnet,
+                                "rn": "extsubnet-[{subnet}]",
                                 "scope": "import-security",
-                                "status": "%s" % subnet_status
-                            }
-                        }
-                    },
-                    {
-                        "fvRsCustQosPol": {
-                            "attributes": {
+                                "status": "{subnet_status}"
+                            }}
+                        }}
+                    }},
+                    {{
+                        "fvRsCustQosPol": {{
+                            "attributes": {{
                                 "status": "created,modified",
                                 "tnQosCustomPolName": ""
-                            }
-                        }
-                    }
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, epg_name=epg_name,
+                   subnet=subnet, status=status, subnet_status=subnet_status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/out-%s/instP-%s.json'
-                       % (self.apic, tn_name, name, epg_name),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}/instP-{}.json'
+                       .format(self.apic, tn_name, name, epg_name),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
         except Exception as e:
-            print("L3 Out (Prefix Based EPG) Failed to deploy. Exception: %s"
-                  % e)
+            print("L3 Out (Prefix Based EPG) Failed to deploy. Exception: {}"
+                  .format(e))
             status = 666
         return status
 
@@ -2790,33 +3083,38 @@ class FabL3Pol(object):
         except:
             status = 667
             return status
-        payload = {
-            "ospfIfPol": {
-                "attributes": {
+        payload = '''
+        {{
+            "ospfIfPol": {{
+                "attributes": {{
                     "cost": "unspecified",
                     "ctrl": "mtu-ignore",
-                    "deadIntvl": "%s" % dead,
-                    "dn": "uni/tn-%s/ospfIfPol-%s" % (tn_name, pol_name),
-                    "helloIntvl": "%s" % hello,
-                    "name": "%s" % pol_name,
-                    "nwT": "%s" % net_type,
+                    "deadIntvl": "{dead}",
+                    "dn": "uni/tn-{tn_name}/ospfIfPol-{pol_name}",
+                    "helloIntvl": "{hello}",
+                    "name": "{pol_name}",
+                    "nwT": "{net_type}",
                     "prio": "1",
                     "rexmitIntvl": "5",
-                    "status": "%s" % status,
+                    "status": "{status}",
                     "xmitDelay": "1"
-                }
-            }
-        }
+                }}
+            }}
+        }}
+        '''.format(tn_name=tn_name, pol_name=pol_name, hello=hello, dead=dead,
+                   net_type=net_type, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/ospfIfPol-%s.json'
-                       % (self.apic, tn_name, pol_name),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/ospfIfPol-{}.json'
+                       .format(self.apic, tn_name, pol_name),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
         except Exception as e:
             print("L3 Out (OSPF Interface Policy) Failed to deploy. "
-                  "Exception: %s" % e)
+                  "Exception: {}".format(e))
             status = 666
         return status
 
@@ -2830,37 +3128,44 @@ class FabL3Pol(object):
     # status: created | created,modified | deleted
     def deploy_int_pol(self, tn_name, name, node_name, int_profile, pol_type,
                        pol_name, status):
-        payload = {
-            "%sIfP" % (pol_type): {
-                "attributes": {
+        payload = '''
+        {{
+            "{pol_type}IfP": {{
+                "attributes": {{
                     "authKeyId": "1",
                     "authType": "none",
-                    "dn": "uni/tn-%s/out-%s/lnodep-%s/lifp-%s/%sIfP" % (tn_name, name, node_name, int_profile, pol_type),
-                    "status": "%s" % (status)
-                },
+                    "dn": "uni/tn-{tn_name}/out-{name}/lnodep-{node_name}/lifp-{int_profile}/{pol_type}IfP",
+                    "status": "{status}"
+                }},
                 "children": [
-                    {
-                        "ospfRsIfPol": {
-                            "attributes": {
+                    {{
+                        "ospfRsIfPol": {{
+                            "attributes": {{
                                 "rn": "rsIfPol",
-                                "status": "%s" % status,
-                                "tnOspfIfPolName": "%s" % pol_name
-                            }
-                        }
-                    }
+                                "status": "{status}",
+                                "tnOspfIfPolName": "{pol_name}"
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, node_name=node_name,
+                   int_profile=int_profile, pol_type=pol_type,
+                   pol_name=pol_name, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/out-%s/lnodep-%s/lifp-%s.json'
-                       % (self.apic, tn_name, name, node_name, int_profile),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}/lnodep-{}/lifp'
+                       '-{}.json' .format(self.apic, tn_name, name, node_name,
+                                          int_profile),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
         except Exception as e:
             print("L3 Out (Deploy Interface Policy) Failed to deploy. "
-                  "Exception: %s" % e)
+                  "Exception: {}".format(e))
             status = 666
         return status
 
@@ -2880,69 +3185,75 @@ class FabL3Pol(object):
         except:
             status = 667
             return status
-        payload = {
-            "l3extLNodeP": {
-                "attributes": {
-                    "dn": "uni/tn-%s/out-%s/lnodep-%s" % (tn_name, name, node_name),
-                    "name": "%s" % node_name,
+        payload = '''
+        {{
+            "l3extLNodeP": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/out-{name}/lnodep-{node_name}",
+                    "name": "{node_name}",
                     "status": "created,modified"
-                },
+                }},
                 "children": [
-                    {
-                        "bgpPeerP": {
-                            "attributes": {
-                                "addr": "%s" % peer,
+                    {{
+                        "bgpPeerP": {{
+                            "attributes": {{
+                                "addr": "{peer}",
                                 "allowedSelfAsCnt": "3",
                                 "ctrl": "",
                                 "peerCtrl": "",
-                                "rn": "peerP-[%s]" % peer,
-                                "status": "%s" % status,
+                                "rn": "peerP-[{peer}]",
+                                "status": "{status}",
                                 "ttl": "1"
-                            },
+                            }},
                             "children": [
-                                {
-                                    "bgpRsPeerPfxPol": {
-                                        "attributes": {
+                                {{
+                                    "bgpRsPeerPfxPol": {{
+                                        "attributes": {{
                                             "rn": "rspeerPfxPol",
                                             "status": "created,modified",
                                             "tnBgpPeerPfxPolName": ""
-                                        }
-                                    }
-                                },
-                                {
-                                    "bgpLocalAsnP": {
-                                        "attributes": {
+                                        }}
+                                    }}
+                                }},
+                                {{
+                                    "bgpLocalAsnP": {{
+                                        "attributes": {{
                                             "asnPropagate": "none",
-                                            "localAsn": "%s" % local_asn,
+                                            "localAsn": "{local_asn}",
                                             "rn": "localasn",
                                             "status": "created,modified"
-                                        }
-                                    }
-                                },
-                                {
-                                    "bgpAsP": {
-                                        "attributes": {
-                                            "asn": "%s" % remote_asn,
+                                        }}
+                                    }}
+                                }},
+                                {{
+                                    "bgpAsP": {{
+                                        "attributes": {{
+                                            "asn": "{remote_asn}",
                                             "rn": "as",
                                             "status": "created,modified"
-                                        }
-                                    }
-                                }
+                                        }}
+                                    }}
+                                }}
                             ]
-                        }
-                    }
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, node_name=node_name, peer=peer,
+                   local_asn=local_asn, remote_asn=remote_asn, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/out-%s.json'
-                       % (self.apic, tn_name, name), data=json.dumps(payload),
-                       cookies=self.cookies, verify=False)
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}.json'
+                       .format(self.apic, tn_name, name),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
             status = r.status_code
         except Exception as e:
             print("L3 Out (BGP Peer - Loopback) Failed to deploy. "
-                  "Exception: %s" % e)
+                  "Exception: {}".format(e))
             status = 666
         return status
 
@@ -2968,79 +3279,87 @@ class FabL3Pol(object):
         except:
             status = 667
             return status
-        payload = {
-            "l3extLIfP": {
-                "attributes": {
-                    "name": "%s" % int_profile,
+        payload = '''
+        {{
+            "l3extLIfP": {{
+                "attributes": {{
+                    "name": "{int_profile}",
                     "status": "created,modified"
-                },
+                }},
                 "children": [
-                    {
-                        "l3extRsPathL3OutAtt": {
-                            "attributes": {
-                                "rn": "rspathL3OutAtt-[topology/pod-1/protpaths-%s-%s/pathep-[%s]]" % (sw1, sw2, vpc),
+                    {{
+                        "l3extRsPathL3OutAtt": {{
+                            "attributes": {{
+                                "rn": "rspathL3OutAtt-[topology/pod-1/protpaths-{sw1}-{sw2}/pathep-[{vpc}]]",
                                 "status": "created,modified"
-                            },
+                            }},
                             "children": [
-                                {
-                                    "bgpPeerP": {
-                                        "attributes": {
-                                            "addr": "%s" % peer,
+                                {{
+                                    "bgpPeerP": {{
+                                        "attributes": {{
+                                            "addr": "{peer}",
                                             "allowedSelfAsCnt": "3",
                                             "ctrl": "",
                                             "peerCtrl": "",
-                                            "rn": "peerP-[%s]" % peer,
-                                            "status": "%s" % status,
+                                            "rn": "peerP-[{peer}]",
+                                            "status": "{status}",
                                             "ttl": "1"
-                                        },
+                                        }},
                                         "children": [
-                                            {
-                                                "bgpRsPeerPfxPol": {
-                                                    "attributes": {
+                                            {{
+                                                "bgpRsPeerPfxPol": {{
+                                                    "attributes": {{
                                                         "rn": "rspeerPfxPol",
                                                         "status": "",
                                                         "tnBgpPeerPfxPolName": ""
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "bgpLocalAsnP": {
-                                                    "attributes": {
+                                                    }}
+                                                }}
+                                            }},
+                                            {{
+                                                "bgpLocalAsnP": {{
+                                                    "attributes": {{
                                                         "asnPropagate": "none",
-                                                        "localAsn": "%s" % local_asn,
+                                                        "localAsn": "{local_asn}",
                                                         "rn": "localasn",
                                                         "status": "created,modified"
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "bgpAsP": {
-                                                    "attributes": {
-                                                        "asn": "%s" % remote_asn,
+                                                    }}
+                                                }}
+                                            }},
+                                            {{
+                                                "bgpAsP": {{
+                                                    "attributes": {{
+                                                        "asn": "{remote_asn}",
                                                         "rn": "as",
                                                         "status": "created,modified"
-                                                    }
-                                                }
-                                            }
+                                                    }}
+                                                }}
+                                            }}
                                         ]
-                                    }
-                                }
+                                    }}
+                                }}
                             ]
-                        }
-                    }
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, node_name=node_name,
+                   int_profile=int_profile, sw1=sw1, sw2=sw2, vpc=vpc,
+                   peer=peer, local_asn=local_asn, remote_asn=remote_asn,
+                   status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/out-%s/lnodep-%s/lifp-%s.json'
-                       % (self.apic, tn_name, name, node_name, int_profile),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}/lnodep-{}/lifp'
+                       '-{}.json' .format(self.apic, tn_name, name, node_name,
+                                          int_profile),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
         except Exception as e:
             print("L3 Out (BGP Peer - SVI) Failed to deploy. "
-                  "Exception: %s" % e)
+                  "Exception: {}".format(e))
             status = 666
         return status
 
@@ -3053,7 +3372,7 @@ class TshootPol(object):
 
     # Method must be called with the following data.
     # tn_name: Name of the Tenant (for source of SPAN)
-    # name: The name of the SPAN Source (automatically append -Group where appropriate)
+    # name: Name of the SPAN Source (automatically append -Group where appropriate)
     # admin: enabled | disabled
     # direction: both | in | out
     # ap: Name of Application Profile (for source of SPAN)
@@ -3061,51 +3380,60 @@ class TshootPol(object):
     # dest: Name of SPAN Destination, -Group is automatically appended
     # status: created | created,modified | deleted
     def span_src(self, tn_name, name, admin, direction, ap, epg, dest, status):
-        payload = {
-            "spanSrcGrp": {
-                "attributes": {
-                    "adminSt": "%s" % admin,
-                    "dn": "uni/tn-%s/srcgrp-%s-Group" % (tn_name, name),
-                    "name": "%s-Group" % name,
-                    "status": "%s" % status
-                },
+        payload = '''
+        {{
+            "spanSrcGrp": {{
+                "attributes": {{
+                    "adminSt": "{admin}",
+                    "dn": "uni/tn-{tn_name}/srcgrp-{name}-Group",
+                    "name": "{name}-Group",
+                    "status": "{status}"
+                }},
                 "children": [
-                    {
-                        "spanSrc": {
-                            "attributes": {
-                                "dir": "%s" % direction,
-                                "name": "%s" % name
-                            },
+                    {{
+                        "spanSrc": {{
+                            "attributes": {{
+                                "dir": "{direction}",
+                                "name": "{name}"
+                            }},
                             "children": [
-                                {
-                                    "spanRsSrcToEpg": {
-                                        "attributes": {
-                                            "tDn": "uni/tn-%s/ap-%s/epg-%s" % (tn_name, ap, epg)
-                                        }
-                                    }
-                                }
+                                {{
+                                    "spanRsSrcToEpg": {{
+                                        "attributes": {{
+                                            "tDn": "uni/tn-{tn_name}/ap-{ap}/epg-{epg}"
+                                        }}
+                                    }}
+                                }}
                             ]
-                        }
-                    },
-                    {
-                        "spanSpanLbl": {
-                            "attributes": {
-                                "name": "%s-Group" % dest,
+                        }}
+                    }},
+                    {{
+                        "spanSpanLbl": {{
+                            "attributes": {{
+                                "name": "{dest}-Group",
                                 "tag": "yellow-green"
-                            }
-                        }
-                    }
+                            }}
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(admin=admin, tn_name=tn_name, name=name, status=status,
+                   direction=direction, ap=ap, epg=epg, dest=dest)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/srcgrp-%s-Group.json'
-                       % (self.apic, tn_name, name), data=json.dumps(payload),
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/srcgrp-'
+                       '{}-Group.json'.format(self.apic, tn_name, name),
+                       data=json.dumps(payload),
                        cookies=self.cookies, verify=False)
             status = r.status_code
         except Exception as e:
-            print("SPAN Source Group Failed to deploy. Exception: %s" % e)
+            print("SPAN Source Group Failed to deploy. Exception: {}"
+                  .format(e))
             status = 666
         return status
 
@@ -3118,51 +3446,61 @@ class TshootPol(object):
     # dest_ip: IP address of device terminating SPAN
     # src_ip: IP address of ACI ERSPAN source
     # status: created | created,modified | deleted
-    def span_dst(self, tn_name, name, tn_dest, ap, epg, dest_ip, src_ip, status):
-        payload = {
-            "spanDestGrp": {
-                "attributes": {
-                    "dn": "uni/tn-%s/destgrp-%s-Group" % (tn_name, name),
-                    "name": "%s-Group" % name,
-                    "status": "%s" % status
-                },
+    def span_dst(self, tn_name, name, tn_dest, ap, epg, dest_ip, src_ip,
+                 status):
+        payload = '''
+        {{
+            "spanDestGrp": {{
+                "attributes": {{
+                    "dn": "uni/tn-{tn_name}/destgrp-{name}-Group",
+                    "name": "{name}-Group",
+                    "status": "{status}"
+                }},
                 "children": [
-                    {
-                        "spanDest": {
-                            "attributes": {
-                                "name": "%s" % name
-                            },
+                    {{
+                        "spanDest": {{
+                            "attributes": {{
+                                "name": "{relay_name}"
+                            }},
                             "children": [
-                                {
-                                    "spanRsDestEpg": {
-                                        "attributes": {
+                                {{
+                                    "spanRsDestEpg": {{
+                                        "attributes": {{
                                             "dscp": "unspecified",
                                             "finalIp": "0.0.0.0",
                                             "flowId": "1",
-                                            "ip": "%s" % dest_ip,
+                                            "ip": "{dest_ip}",
                                             "mtu": "1518",
-                                            "srcIpPrefix": "%s" % src_ip,
-                                            "tDn": "uni/tn-%s/ap-%s/epg-%s" % (tn_dest, ap, epg),
+                                            "srcIpPrefix": "{src_ip}",
+                                            "tDn": "uni/tn-{tn_dest}/ap-{ap}/epg-{epg}",
                                             "ttl": "64",
                                             "ver": "ver2",
                                             "verEnforced": "no"
-                                        }
-                                    }
-                                }
+                                        }}
+                                    }}
+                                }}
                             ]
-                        }
-                    }
+                        }}
+                    }}
                 ]
-            }
-        }
+            }}
+        }}
+        '''.format(tn_name=tn_name, name=name, status=status, dest_ip=dest_ip,
+                   src_ip=src_ip, tn_dest=tn_dest, ap=ap, epg=epg)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.post('https://%s/api/node/mo/uni/tn-%s/destgrp-%s-Group.json'
-                       % (self.apic, tn_name, name), data=json.dumps(payload),
-                       cookies=self.cookies, verify=False)
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/destgrp-{}-Group.'
+                       'json'.format(self.apic, tn_name, name),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
             status = r.status_code
         except Exception as e:
-            print("SPAN Destination Group Failed to deploy. Exception: %s" % e)
+            print("SPAN Destination Group Failed to deploy. Exception: {}"
+                  .format(e))
             status = 666
         return status
 
@@ -3177,13 +3515,29 @@ class Query(object):
     # dn: DN of object you would like to query
     # Returns status code and json payload of query
     def query_dn(self, dn):
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
-            r = s.get('https://%s/api/node/mo/%s.json'
-                      % (self.apic, dn), cookies=self.cookies, verify=False)
+            r = s.get('https://{}/api/node/mo/{}.json'.format(self.apic, dn),
+                      cookies=self.cookies, verify=False)
             status = r.status_code
             payload = json.loads(r.text)
         except Exception as e:
-            print("Failed to query DN. Exception: %s" % e)
+            print("Failed to query DN. Exception: {}".format(e))
+            status = 666
+        return (status, payload)
+
+    def query_class(self, query_class):
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
+        s = requests.Session()
+        try:
+            r = s.get('https://{}/api/class/{}.json'.format(self.apic,
+                      query_class), cookies=self.cookies, verify=False)
+            status = r.status_code
+            payload = json.loads(r.text)
+        except Exception as e:
+            print("Failed to query Class. Exception: {}".format(e))
             status = 666
         return (status, payload)
