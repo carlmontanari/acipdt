@@ -14,7 +14,7 @@ def read_in():
     try:
         wb = xlrd.open_workbook('ACI Deploy.xls')
         print("Workbook Loaded.")
-    except Exception, e:
+    except Exception as e:
         print("Something went wrong logging opening the workbook - ABORT!")
         sys.exit(e)
     return wb
@@ -200,7 +200,7 @@ def main():
     # Disable urllib3 warnings
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
     # Static APIC information
-    apic = '10.10.10.20'
+    apic = '192.168.132.10'
     user = 'admin'
     pword = 'password'
     # Initialize the fabric login method, passing appropriate variables
@@ -221,6 +221,7 @@ def main():
     l3_policies(apic, cookies, wb, wr_wb)
     # Write to the workbook
     wr_wb.save('ACI Deploy.xls')
+
 
 if __name__ == '__main__':
     main()
