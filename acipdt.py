@@ -39,7 +39,7 @@ appropriate variables into this to deploy a fabric from scratch.
 
 
 # Class must be instantiated with APIC IP address, username, and password
-# the login function returns the APIC cookies.
+# the login method returns the APIC cookies.
 class FabLogin(object):
     def __init__(self, apic, user, pword):
         self.apic = apic
@@ -174,7 +174,7 @@ class FabPodPol(object):
                        verify=False)
             status = r.status_code
         except Exception as e:
-            print("Hadrware Failed to provision. Exception: {}".format(e))
+            print("Hardware Failed to provision. Exception: {}".format(e))
             status = 666
         return status
 
@@ -3515,8 +3515,6 @@ class Query(object):
     # dn: DN of object you would like to query
     # Returns status code and json payload of query
     def query_dn(self, dn):
-        payload = json.loads(payload,
-                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
             r = s.get('https://{}/api/node/mo/{}.json'.format(self.apic, dn),
@@ -3529,8 +3527,6 @@ class Query(object):
         return (status, payload)
 
     def query_class(self, query_class):
-        payload = json.loads(payload,
-                             object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
         try:
             r = s.get('https://{}/api/class/{}.json'.format(self.apic,
@@ -3541,3 +3537,77 @@ class Query(object):
             print("Failed to query Class. Exception: {}".format(e))
             status = 666
         return (status, payload)
+
+
+# Class must be instantiated with APIC IP address and cookies
+class FabCfgMgmt(object):
+    def __init__(self, apic, cookies):
+        self.apic = apic
+        self.cookies = cookies
+
+    # Method must be called with the following data.
+    # name = name of the snapshot itself
+    # status = created | created,modified | deleted
+    def take_snapshot(self, name, status):
+        payload = '''
+        {{
+            "configExportP": {{
+                "attributes": {{
+                    "dn": "uni/fabric/configexp-{name}",
+                    "name": "{name}",
+                    "snapshot": "true",
+                    "targetDn": "",
+                    "adminSt": "triggered",
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(name=name, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
+        s = requests.Session()
+        try:
+            r = s.post('https://{}/api/node/mo/uni/fabric/configexp-{}.jso'
+                       'n'.format(self.apic, name),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
+            status = r.status_code
+        except Exception as e:
+            print("Failed to take snapshot. Exception: {}".format(e))
+            status = 666
+        return status
+
+    # Method must be called with the following data.
+    # name = name of the snapshot itself (note you need to put the file
+    # extension in yourself)
+    def snapback(self, name):
+        payload = '''
+        {{
+            "configImportP": {{
+                "attributes": {{
+                    "dn": "uni/fabric/configimp-default",
+                    "name": "default",
+                    "snapshot": "true",
+                    "adminSt": "triggered",
+                    "fileName": "{name}",
+                    "importType": "replace",
+                    "importMode": "atomic",
+                    "rn": "configimp-default",
+                    "status": "created,modified"
+                }}
+            }}
+        }}
+        '''.format(name=name)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
+        s = requests.Session()
+        try:
+            r = s.post('https://{}/api/node/mo/uni/fabric/configimp-default.js'
+                       'on'.format(self.apic),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
+            status = r.status_code
+        except Exception as e:
+            print("Failed to snapback. Exception: {}".format(e))
+            status = 666
+        return status

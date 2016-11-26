@@ -1,4 +1,4 @@
-from acitool import acipdt
+from TOOL import acipdt
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import sys
@@ -196,13 +196,77 @@ def l3_policies(apic, cookies, wb, wr_wb):
             time.sleep(.025)
 
 
+def take_snapshot(apic, cookies, snapshot_name):
+    query = acipdt.Query(apic, cookies)
+    query_string = 'configSnapshot'
+    query_payload = query.query_class(query_string)
+    payload_len = len(query_payload[1]['imdata'])
+    snap_count = 0
+    for x in range(0, payload_len):
+        if (query_payload[1]['imdata'][x]['configSnapshot']['attributes']
+                ['fileName'])[4:17] == snapshot_name:
+                snap_count += 1
+
+    if snap_count > 0:
+        print("A snapshot with that name ({}) already exists. Please change th"
+              "e name of the snapshot in the main.py file, or delete the exist"
+              "ing snapshot. Exiting.".format(snapshot_name))
+        sys.exit()
+    elif snap_count == 0:
+        status = 'created,modified'
+        cfgmgmt = acipdt.FabCfgMgmt(apic, cookies)
+        status = cfgmgmt.take_snapshot(snapshot_name, status)
+        if status == 200:
+            print("Snapshot taken successfully, continuing.")
+            time.sleep(5)
+        else:
+            print("Snapshot failed for some reason, do you want to continue?")
+            while True:
+                user_input = input("Continue 'y' or 'n' [n]: ")
+                selection = user_input or 'n'
+                if selection.lower() == 'y':
+                    continue
+                elif selection.lower() == 'n':
+                    del_snap_pol(apic, cookies, snapshot_name)
+                    sys.exit()
+
+
+def revert_snapshot(apic, cookies, snapshot_name):
+    print('Deployment completed, please verify status in workbook.')
+    user_input = input("Rollback to previous snapshot 'y' or 'n' [n]: ")
+    selection = user_input or 'n'
+    if selection.lower() == 'n':
+        pass
+    elif selection.lower() == 'y':
+        query = acipdt.Query(apic, cookies)
+        query_string = 'configSnapshot'
+        query_payload = query.query_class(query_string)
+        payload_len = len(query_payload[1]['imdata'])
+        for x in range(0, payload_len):
+            if (query_payload[1]['imdata'][x]['configSnapshot']['attributes']
+                    ['fileName'])[4:17] == snapshot_name:
+                snapshot_name = (query_payload[1]['imdata'][x]
+                                 ['configSnapshot']['attributes']
+                                 ['fileName'])
+                break
+        cfgmgmt = acipdt.FabCfgMgmt(apic, cookies)
+        cfgmgmt.snapback(snapshot_name)
+
+
+def del_snap_pol(apic, cookies, snapshot_name):
+    status = 'deleted'
+    cfgmgmt = acipdt.FabCfgMgmt(apic, cookies)
+    status = cfgmgmt.take_snapshot(snapshot_name, status)
+
+
 def main():
     # Disable urllib3 warnings
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
     # Static APIC information
-    apic = '192.168.132.10'
+    apic = '10.10.10.20'
     user = 'admin'
     pword = 'password'
+    snapshot_name = 'acipdt_backup'
     # Initialize the fabric login method, passing appropriate variables
     fablogin = acipdt.FabLogin(apic, user, pword)
     # Run the login and load the cookies var
@@ -211,16 +275,22 @@ def main():
     wb = read_in()
     # Copy workbook to a RW version
     wr_wb = copy(wb)
+    # Take snapshot before deployment
+    take_snapshot(apic, cookies, snapshot_name)
     # Run pod policies function, pass apic and cookies
-    pod_policies(apic, cookies, wb, wr_wb)
+    #pod_policies(apic, cookies, wb, wr_wb)
     # Run access policies function, pass apic and cookies
-    access_policies(apic, cookies, wb, wr_wb)
+    #access_policies(apic, cookies, wb, wr_wb)
     # Run tenant policies function, pass apic and cookies
-    tn_policies(apic, cookies, wb, wr_wb)
+    #tn_policies(apic, cookies, wb, wr_wb)
     # Run l3 policies function, pass apic and cookies
-    l3_policies(apic, cookies, wb, wr_wb)
+    #l3_policies(apic, cookies, wb, wr_wb)
     # Write to the workbook
     wr_wb.save('ACI Deploy.xls')
+    # Prompt to see if user wants to rollback to previous snapshot
+    revert_snapshot(apic, cookies, snapshot_name)
+    # Delete the snapshot policy
+    del_snap_pol(apic, cookies, snapshot_name)
 
 
 if __name__ == '__main__':
