@@ -3545,24 +3545,87 @@ class FabCfgMgmt(object):
         self.apic = apic
         self.cookies = cookies
 
+    # Method must be called with the following data. Note only supports
+    # SCP at this time (could easily add SFTP or FTP if needed though)
+    # name = name of the remote location
+    # ip = IP of the remote location (note, module does no validation)
+    # path = Path on the remote location
+    # user = username for remote location
+    # pword = password (sent in clear text) for the remote location
+    # status = created | created,modified | deleted
+    def remote_path(self, name, ip, path, user, pword, status):
+        payload = '''
+        {{
+        "fileRemotePath": {{
+            "attributes": {{
+                "descr": "",
+                "dn": "uni/fabric/path-{name}",
+                "host": "{ip}",
+                "name": "{name}",
+                "protocol": "scp",
+                "remotePath": "{path}",
+                "remotePort": "22",
+                "userName": "Carl",
+                "userPasswd": "{pword}",
+                "status": "{status}"
+            }},
+                "children": [
+                    {{
+                    "fileRsARemoteHostToEpg": {{
+                        "attributes": {{
+                            "tDn": "uni/tn-mgmt/mgmtp-default/oob-default"
+                            }}
+                        }}
+                    }}
+                ]
+            }}
+        }}
+        '''.format(name=name, ip=ip, path=path, user=user, pword=pword,
+                   status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
+        s = requests.Session()
+        try:
+            r = s.post('https://{}/api/node/mo/uni/fabric/path-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
+                       cookies=self.cookies, verify=False)
+            status = r.status_code
+        except Exception as e:
+            print("Failed to create remote location. Exception: {}".format(e))
+            status = 666
+        return status
+
     # Method must be called with the following data.
     # name = name of the snapshot itself
+    # snapshot = true | false - if true it creates an export policy and
+    # takes a snapshot, if false it simply creates an export policy
     # status = created | created,modified | deleted
-    def take_snapshot(self, name, status):
+    # path = (Optional) remote path for export (can be left blank for snapshot)
+    def backup(self, name, snapshot, status, path=''):
         payload = '''
         {{
             "configExportP": {{
                 "attributes": {{
                     "dn": "uni/fabric/configexp-{name}",
                     "name": "{name}",
-                    "snapshot": "true",
+                    "format": "json",
+                    "snapshot": "{snapshot}",
                     "targetDn": "",
                     "adminSt": "triggered",
                     "status": "{status}"
-                }}
+                }},
+                "children": [
+                    {{
+                        "configRsRemotePath": {{
+                            "attributes": {{
+                                "tnFileRemotePathName": "{path}"
+                            }}
+                        }}
+                    }}
+                ]
             }}
         }}
-        '''.format(name=name, status=status)
+        '''.format(name=name, snapshot=snapshot, path=path, status=status)
         payload = json.loads(payload,
                              object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
@@ -3574,6 +3637,51 @@ class FabCfgMgmt(object):
             status = r.status_code
         except Exception as e:
             print("Failed to take snapshot. Exception: {}".format(e))
+            status = 666
+        return status
+
+    # Method must be called with the following data.
+    # name = name of the import object itself
+    # filename = name of the file to import
+    # path = name of the remote path object where the file lives
+    def replace(self, name, filename, path):
+        payload = '''
+        {{
+          "configImportP": {{
+            "attributes": {{
+              "dn": "uni/fabric/configimp-{name}",
+              "name": "{name}",
+              "fileName": "{filename}",
+              "importType": "replace",
+              "rn": "configimp-test",
+              "adminSt": "triggered",
+              "status": "created"
+            }},
+            "children": [
+            {{
+              "configRsRemotePath": {{
+                "attributes": {{
+                  "tnFileRemotePathName": "{path}",
+                  "status": "created,modified"
+                }},
+                "children": []
+                }}
+              }}
+            ]
+          }}
+        }}
+        '''.format(name=name, filename=filename, path=path)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
+        s = requests.Session()
+        try:
+            r = s.post('https://{}/api/node/mo/uni/fabric/configimp-{}.json'
+                       .format(self.apic, name), data=json.dumps(payload),
+                       cookies=self.cookies, verify=False)
+            status = r.status_code
+        except Exception as e:
+            print("Failed to import and replace config. Exception: {}"
+                  .format(e))
             status = 666
         return status
 
