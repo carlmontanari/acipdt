@@ -3529,7 +3529,7 @@ class Query(object):
     def query_class(self, query_class):
         s = requests.Session()
         try:
-            r = s.get('https://{}/api/class/{}.json'.format(self.apic,
+            r = s.get('https://{}/api/node/class/{}.json'.format(self.apic,
                       query_class), cookies=self.cookies, verify=False)
             status = r.status_code
             payload = json.loads(r.text)
