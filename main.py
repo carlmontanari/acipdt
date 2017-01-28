@@ -1,4 +1,4 @@
-from TOOL import acipdt
+from acitool import acipdt
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import sys
@@ -213,9 +213,10 @@ def take_snapshot(apic, cookies, snapshot_name):
               "ing snapshot. Exiting.".format(snapshot_name))
         sys.exit()
     elif snap_count == 0:
+        snapshot = 'true'
         status = 'created,modified'
         cfgmgmt = acipdt.FabCfgMgmt(apic, cookies)
-        status = cfgmgmt.take_snapshot(snapshot_name, status)
+        status = cfgmgmt.backup(snapshot_name, snapshot, status)
         if status == 200:
             print("Snapshot taken successfully, continuing.")
             time.sleep(5)
@@ -255,15 +256,16 @@ def revert_snapshot(apic, cookies, snapshot_name):
 
 def del_snap_pol(apic, cookies, snapshot_name):
     status = 'deleted'
+    snapshot = 'true'
     cfgmgmt = acipdt.FabCfgMgmt(apic, cookies)
-    status = cfgmgmt.take_snapshot(snapshot_name, status)
+    status = cfgmgmt.backup(snapshot_name, snapshot, status)
 
 
 def main():
     # Disable urllib3 warnings
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
     # Static APIC information
-    apic = '10.10.10.20'
+    apic = '192.168.132.10'
     user = 'admin'
     pword = 'password'
     snapshot_name = 'acipdt_backup'
@@ -278,13 +280,13 @@ def main():
     # Take snapshot before deployment
     take_snapshot(apic, cookies, snapshot_name)
     # Run pod policies function, pass apic and cookies
-    #pod_policies(apic, cookies, wb, wr_wb)
+    pod_policies(apic, cookies, wb, wr_wb)
     # Run access policies function, pass apic and cookies
-    #access_policies(apic, cookies, wb, wr_wb)
+    access_policies(apic, cookies, wb, wr_wb)
     # Run tenant policies function, pass apic and cookies
-    #tn_policies(apic, cookies, wb, wr_wb)
+    tn_policies(apic, cookies, wb, wr_wb)
     # Run l3 policies function, pass apic and cookies
-    #l3_policies(apic, cookies, wb, wr_wb)
+    l3_policies(apic, cookies, wb, wr_wb)
     # Write to the workbook
     wr_wb.save('ACI Deploy.xls')
     # Prompt to see if user wants to rollback to previous snapshot
