@@ -1807,63 +1807,112 @@ class FabTnPol(object):
     # scope: public | private | shared | public,shared | private,shared
     # status: created | created,modified | deleted
     def bd(self, tn_name, name, arp, mdest, mcast, unicast, unk_unicast, vrf,
-           l3_out, subnet, scope, status):
-        payload = '''
-        {{
-            "fvBD": {{
-                "attributes": {{
-                    "arpFlood": "{arp}",
-                    "dn": "uni/tn-{tn_name}/BD-{name}",
-                    "epMoveDetectMode": "",
-                    "limitIpLearnToSubnets": "no",
-                    "llAddr": "::",
-                    "mac": "00:22:BD:F8:19:FF",
-                    "multiDstPktAct": "{mdest}",
-                    "name": "{name}",
-                    "status": "{status}",
-                    "unicastRoute": "{unicast}",
-                    "unkMacUcastAct": "{unk_unicast}",
-                    "unkMcastAct": "{mcast}"
-                }},
-                "children": [
-                    {{
-                        "fvRsBDToOut": {{
+           subnet, scope, status, l3_out=''):
+        if l3_out == '':
+            payload = '''
+               {{
+                        "fvBD": {{
                             "attributes": {{
-                                "rn": "rsBDToOut-{l3_out}",
-                                "status": "created,modified",
-                                "tnL3extOutName": "{l3_out}"
-                            }}
-                        }}
-                    }},
-                    {{
-                        "fvRsCtx": {{
-                            "attributes": {{
-                                "rn": "rsctx",
-                                "status": "crated,modified",
-                                "tnFvCtxName": "{vrf}"
-                            }}
-                        }}
-                    }},
-                    {{
-                        "fvSubnet": {{
-                            "attributes": {{
-                                "ctrl": "",
-                                "ip": "{subnet}",
-                                "name": "",
-                                "preferred": "yes",
-                                "rn": "subnet-[{subnet}]",
-                                "scope": "{scope}",
-                                "status": "created,modified"
-                            }}
+                                "arpFlood": "{arp}",
+                                "dn": "uni/tn-{tn_name}/BD-{name}",
+                                "epMoveDetectMode": "",
+                                "limitIpLearnToSubnets": "no",
+                                "llAddr": "::",
+                                "mac": "00:22:BD:F8:19:FF",
+                                "multiDstPktAct": "{mdest}",
+                                "name": "{name}",
+                                "status": "{status}",
+                                "unicastRoute": "{unicast}",
+                                "unkMacUcastAct": "{unk_unicast}",
+                                "unkMcastAct": "{mcast}"
+                            }},
+                            "children": [
+                                {{
+                                    "fvRsCtx": {{
+                                        "attributes": {{
+                                            "rn": "rsctx",
+                                            "status": "crated,modified",
+                                            "tnFvCtxName": "{vrf}"
+                                        }}
+                                    }}
+                                }},
+                                {{
+                                    "fvSubnet": {{
+                                        "attributes": {{
+                                            "ctrl": "",
+                                            "ip": "{subnet}",
+                                            "name": "",
+                                            "preferred": "yes",
+                                            "rn": "subnet-[{subnet}]",
+                                            "scope": "{scope}",
+                                            "status": "created,modified"
+                                        }}
+                                    }}
+                                }}
+                            ]
                         }}
                     }}
-                ]
-            }}
-        }}
-        '''.format(tn_name=tn_name, name=name, arp=arp, mdest=mdest,
-                   mcast=mcast, unicast=unicast, unk_unicast=unk_unicast,
-                   vrf=vrf, l3_out=l3_out, subnet=subnet, scope=scope,
-                   status=status)
+                    '''.format(tn_name=tn_name, name=name, arp=arp, mdest=mdest,
+                               mcast=mcast, unicast=unicast, unk_unicast=unk_unicast,
+                               vrf=vrf, l3_out=l3_out, subnet=subnet, scope=scope,
+                               status=status)
+        else:
+            payload = '''
+                {{
+                    "fvBD": {{
+                        "attributes": {{
+                            "arpFlood": "{arp}",
+                            "dn": "uni/tn-{tn_name}/BD-{name}",
+                            "epMoveDetectMode": "",
+                            "limitIpLearnToSubnets": "no",
+                            "llAddr": "::",
+                            "mac": "00:22:BD:F8:19:FF",
+                            "multiDstPktAct": "{mdest}",
+                            "name": "{name}",
+                            "status": "{status}",
+                            "unicastRoute": "{unicast}",
+                            "unkMacUcastAct": "{unk_unicast}",
+                            "unkMcastAct": "{mcast}"
+                        }},
+                        "children": [
+                            {{
+                                "fvRsBDToOut": {{
+                                    "attributes": {{
+                                        "rn": "rsBDToOut-{l3_out}",
+                                        "status": "created,modified",
+                                        "tnL3extOutName": "{l3_out}"
+                                    }}
+                                }}
+                            }},
+                            {{
+                                "fvRsCtx": {{
+                                    "attributes": {{
+                                        "rn": "rsctx",
+                                        "status": "crated,modified",
+                                        "tnFvCtxName": "{vrf}"
+                                    }}
+                                }}
+                            }},
+                            {{
+                                "fvSubnet": {{
+                                    "attributes": {{
+                                        "ctrl": "",
+                                        "ip": "{subnet}",
+                                        "name": "",
+                                        "preferred": "yes",
+                                        "rn": "subnet-[{subnet}]",
+                                        "scope": "{scope}",
+                                        "status": "created,modified"
+                                    }}
+                                }}
+                            }}
+                        ]
+                    }}
+                }}
+                '''.format(tn_name=tn_name, name=name, arp=arp, mdest=mdest,
+                           mcast=mcast, unicast=unicast, unk_unicast=unk_unicast,
+                           vrf=vrf, l3_out=l3_out, subnet=subnet, scope=scope,
+                           status=status)
         payload = json.loads(payload,
                              object_pairs_hook=collections.OrderedDict)
         s = requests.Session()
@@ -3352,13 +3401,75 @@ class FabL3Pol(object):
         s = requests.Session()
         try:
             r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}/lnodep-{}/lifp'
-                       '-{}.json' .format(self.apic, tn_name, name, node_name,
+                       '-{}.json'.format(self.apic, tn_name, name, node_name,
                                           int_profile),
                        data=json.dumps(payload), cookies=self.cookies,
                        verify=False)
             status = r.status_code
         except Exception as e:
             print("L3 Out (BGP Peer - SVI) Failed to deploy. "
+                  "Exception: {}".format(e))
+            status = 666
+        return status
+
+    # tn_name: Name of the Tenant
+    # name: The name of the L3 Out
+    # epg_name: Name of the L3 Out EPG (Network object)
+    # contract: Name of the contract to provide
+    # status: created | created,modified | deleted
+    def l3_provide_contract(self, tn_name, name, epg_name, contract, status):
+        payload = '''
+        {{
+            "fvRsProv": {{
+                "attributes": {{
+                    "tnVzBrCPName": "{contract}",
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(contract=contract, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
+        s = requests.Session()
+        try:
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}/instP-{}.json'
+                       .format(self.apic, tn_name, name, epg_name),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
+            status = r.status_code
+        except Exception as e:
+            print("L3 Out (provide contract) Failed to deploy. "
+                  "Exception: {}".format(e))
+            status = 666
+        return status
+
+    # tn_name: Name of the Tenant
+    # name: The name of the L3 Out
+    # epg_name: Name of the L3 Out EPG (Network object)
+    # contract: Name of the contract to consume
+    # status: created | created,modified | deleted
+    def l3_consume_contract(self, tn_name, name, epg_name, contract, status):
+        payload = '''
+        {{
+            "fvRsCons": {{
+                "attributes": {{
+                    "tnVzBrCPName": "{contract}",
+                    "status": "{status}"
+                }}
+            }}
+        }}
+        '''.format(contract=contract, status=status)
+        payload = json.loads(payload,
+                             object_pairs_hook=collections.OrderedDict)
+        s = requests.Session()
+        try:
+            r = s.post('https://{}/api/node/mo/uni/tn-{}/out-{}/instP-{}.json'
+                       .format(self.apic, tn_name, name, epg_name),
+                       data=json.dumps(payload), cookies=self.cookies,
+                       verify=False)
+            status = r.status_code
+        except Exception as e:
+            print("L3 Out (provide contract) Failed to deploy. "
                   "Exception: {}".format(e))
             status = 666
         return status
