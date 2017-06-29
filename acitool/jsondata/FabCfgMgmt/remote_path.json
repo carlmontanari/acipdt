@@ -1,0 +1,25 @@
+{
+"fileRemotePath": {
+    "attributes": {
+        "descr": "",
+        "dn": "uni/fabric/path-{{name}}",
+        "host": "{{ip}}",
+        "name": "{{name}}",
+        "protocol": "scp",
+        "remotePath": "{{path}}",
+        "remotePort": "22",
+        "userName": "{{user}}",
+        "userPasswd": "{{pword}}",
+        "status": "{{status}}"
+    },
+        "children": [
+            {
+            "fileRsARemoteHostToEpg": {
+                "attributes": {
+                    "tDn": "uni/tn-mgmt/mgmtp-default/oob-default"
+                    }
+                }
+            }
+        ]
+    }
+}

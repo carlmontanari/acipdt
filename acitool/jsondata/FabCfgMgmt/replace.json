@@ -1,0 +1,24 @@
+{
+  "configImportP": {
+    "attributes": {
+      "dn": "uni/fabric/configimp-{{name}}",
+      "name": "{{name}}",
+      "fileName": "{{filename}}",
+      "importType": "replace",
+      "rn": "configimp-test",
+      "adminSt": "triggered",
+      "status": "created,modified"
+    },
+    "children": [
+    {
+      "configRsRemotePath": {
+        "attributes": {
+          "tnFileRemotePathName": "{{path}}",
+          "status": "created,modified"
+        },
+        "children": []
+        }
+      }
+    ]
+  }
+}

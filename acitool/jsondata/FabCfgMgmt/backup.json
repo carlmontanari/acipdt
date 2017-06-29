@@ -1,0 +1,22 @@
+{
+    "configExportP": {
+        "attributes": {
+            "dn": "uni/fabric/configexp-{{name}}",
+            "name": "{{name}}",
+            "format": "json",
+            "snapshot": "{{snapshot}}",
+            "targetDn": "",
+            "adminSt": "triggered",
+            "status": "{{status}}"
+        },
+        "children": [
+            {
+                "configRsRemotePath": {
+                    "attributes": {
+                        "tnFileRemotePathName": "{{path}}"
+                    }
+                }
+            }
+        ]
+    }
+}

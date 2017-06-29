@@ -1,0 +1,15 @@
+{
+    "configImportP": {
+        "attributes": {
+            "dn": "uni/fabric/configimp-default",
+            "name": "default",
+            "snapshot": "true",
+            "adminSt": "triggered",
+            "fileName": "{{name}}",
+            "importType": "replace",
+            "importMode": "atomic",
+            "rn": "configimp-default",
+            "status": "created,modified"
+        }
+    }
+}
