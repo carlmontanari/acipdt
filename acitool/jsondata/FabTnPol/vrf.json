@@ -1,0 +1,11 @@
+{
+    "fvCtx": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/ctx-{{name}}",
+            "knwMcastAct": "permit",
+            "name": "{{name}}",
+            "pcEnfPref": "{{enforce}}",
+            "status": "{{status}}"
+        }
+    }
+}

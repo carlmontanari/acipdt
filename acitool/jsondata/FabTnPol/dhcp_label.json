@@ -1,0 +1,10 @@
+{
+    "dhcpLbl": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/BD-{{bd_name}}/dhcplbl-{{relay_name}}",
+            "name": "{{relay_name}}",
+            "owner": "{{scope}}",
+            "status": "{{status}}"
+        }
+    }
+}

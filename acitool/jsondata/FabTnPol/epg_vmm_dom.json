@@ -1,0 +1,25 @@
+{
+    "fvRsDomAtt": {
+        "attributes": {
+            "childAction": "",
+            "dn": "uni/tn-{{tn_name}}/ap-{{ap_name}}/epg-{{epg_name}}/rsdomAtt-[uni/vmmp-VMware/dom-{{vmm_dom}}]",
+            "instrImedcy": "{{deploy}}",
+            "resImedcy": "{{resolve}}",
+            "status": "{{status}}",
+            "tDn": "uni/vmmp-VMware/dom-{{vmm_dom}}"
+        },
+        "children": [
+            {
+                "vmmSecP": {
+                    "attributes": {
+                        "allowPromiscuous": "reject",
+                        "forgedTransmits": "reject",
+                        "macChanges": "reject",
+                        "rn": "sec",
+                        "status": "created,modified"
+                    }
+                }
+            }
+        ]
+    }
+}

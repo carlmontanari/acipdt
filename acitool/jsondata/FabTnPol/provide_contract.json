@@ -1,0 +1,10 @@
+{
+    "fvRsProv": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/ap-{{ap_name}}/epg-{{epg_name}}/rsprov-{{contract}}",
+            "prio": "unspecified",
+            "status": "{{status}}",
+            "tnVzBrCPName": "{{contract}}"
+        }
+    }
+}

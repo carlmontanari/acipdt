@@ -1,0 +1,9 @@
+{
+    "fvAp": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/ap-{{name}}",
+            "name": "{{name}}",
+            "status": "{{status}}"
+        }
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "vzFilter": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/flt-{{name}}",
+            "name": "{{name}}",
+            "status": "{{status}}"
+        },
+        "children": [
+            {
+                "vzEntry": {
+                    "attributes": {
+                        "applyToFrag": "no",
+                        "arpOpc": "unspecified",
+                        "dFromPort": "{{dst_start}}",
+                        "dToPort": "{{dst_end}}",
+                        "etherT": "{{ethertype}}",
+                        "icmpv4T": "unspecified",
+                        "icmpv6T": "unspecified",
+                        "name": "{{name}}",
+                        "prot": "{{protocol}}",
+                        "rn": "e-{{name}}",
+                        "sFromPort": "{{src_start}}",
+                        "sToPort": "{{src_end}}",
+                        "stateful": "no",
+                        "status": "{{status}}",
+                        "tcpRules": ""
+                    }
+                }
+            }
+        ]
+    }
+}

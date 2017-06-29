@@ -1,0 +1,22 @@
+{
+    "fvAEPg": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/ap-{{ap_name}}/epg-{{epg_name}}",
+            "name": "{{epg_name}}",
+            "rn": "epg-{{epg_name}}",
+            "status": "created,modified"
+        },
+        "children": [
+            {
+                "fvRsPathAtt": {
+                    "attributes": {
+                        "dn": "uni/tn-{{tn_name}}/ap-{{ap_name}}/epg-{{epg_name}}/rspathAtt-[topology/pod-{{pod}}/paths-{{sw1}}/pathep-[eth1/{{port}}]]",
+                        "encap": "vlan-{{encap}}",
+                        "instrImedcy": "{{deploy}}",
+                        "status": "{{status}}"
+                    }
+                }
+            }
+        ]
+    }
+}

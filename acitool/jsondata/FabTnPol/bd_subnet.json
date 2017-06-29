@@ -1,0 +1,24 @@
+{
+    "fvBD": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/BD-{{name}}",
+            "name": "{{name}}",
+            "status": "created,modified"
+        },
+        "children": [
+            {
+                "fvSubnet": {
+                    "attributes": {
+                        "ctrl": "",
+                        "ip": "{{subnet}}",
+                        "name": "",
+                        "preferred": "{{preferred}}",
+                        "rn": "subnet-[{{subnet}}]",
+                        "scope": "{{scope}}",
+                        "status": "{{status}}"
+                    }
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "fvRsDomAtt": {
+        "attributes": {
+            "childAction": "",
+            "dn": "uni/tn-{{tn_name}}/ap-{{ap_name}}/epg-{{epg_name}}/rsdomAtt-[uni/phys-{{phys_dom}}]",
+            "instrImedcy": "{{deploy}}",
+            "resImedcy": "{{resolve}}",
+            "status": "{{status}}"
+        }
+    }
+}

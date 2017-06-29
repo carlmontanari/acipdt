@@ -1,0 +1,20 @@
+{
+    "dhcpRelayP": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/relayp-{{relay_name}}",
+            "name": "{{relay_name}}",
+            "status": "{{status}}"
+        },
+        "children": [
+            {
+                "dhcpRsProv": {
+                    "attributes": {
+                        "addr": "{{dhcp_ip}}",
+                        "rn": "rsprov-[uni/tn-{{l3_tn}}/out-{{l3_out}}/instP-{{l3_network}}]",
+                        "status": "{{status}}"
+                    }
+                }
+            }
+        ]
+    }
+}
