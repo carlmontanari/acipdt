@@ -4,6 +4,8 @@
 
 The latest updates to the master branch represent a MASSIVE overhaul to this tool. The biggest update is the conversion to rendering json files with Jinja2 as oposed to the clunky multi-line strings previously used. There have also been a ton of minor updates/tweaks/bug fixes. Finally the "main.py" (which really needs to be renamed) has been cleaned up a bit and now prompts for directory to the deployment spreadsheet, the IP for the fabric (IP only for now, but could easily enough add name support I believe), and the username and password.
 
+*Note* The multipod functionality is super super super beta! You've been warned.
+
 ## Synopsis
 
 ACIPDT - or ACI Power Deployment Tool - is a Python library that is intended to be used for network engineers deploying an ACI fabric. ACIPDT is very much early alpha, later releases should add additional features/functionality as well as optimization and improved error handling. 
