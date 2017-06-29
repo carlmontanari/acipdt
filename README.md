@@ -1,5 +1,9 @@
 # acitool
 
+## Updates/News
+
+The latest updates to the master branch represent a MASSIVE overhaul to this tool. The biggest update is the conversion to rendering json files with Jinja2 as oposed to the clunky multi-line strings previously used. There have also been a ton of minor updates/tweaks/bug fixes. Finally the "main.py" (which really needs to be renamed) has been cleaned up a bit and now prompts for directory to the deployment spreadsheet, the IP for the fabric (IP only for now, but could easily enough add name support I believe), and the username and password.
+
 ## Synopsis
 
 ACIPDT - or ACI Power Deployment Tool - is a Python library that is intended to be used for network engineers deploying an ACI fabric. ACIPDT is very much early alpha, later releases should add additional features/functionality as well as optimization and improved error handling. 
@@ -12,7 +16,7 @@ Cisco ACI, as with the other newtorky "SDN products," in the market have provide
 
 Postman left much to be desired. I'm fairly certain that the way in which I was using it was never really the intended use case. In order to keep the collections to a reasonable size, which in turn kept spreadsheets relatively organized (spreadsheets contained the data to insert as a variable in the payloads), but then I had nine collections to run, which meant nine spreadsheets. On top of all of that, there was very little feedback in terms of even simple success/fail per post -- and even if you captured that output, there would be things that would fail no matter what due to the way the spreadsheet was piping in variables (perhaps more on that later, maybe its just how I was using it).
 
-The result of this frustration is the ACIPDT. My intention is to re-create the functionality that I have used Postman for in Python. In doing so, the goal is to have a single spreadsheet (source of data, could be anything but a spreadsheet is easy), to run a single script, and to have valuable feedback about the success or failure of each and every POST. ACIPDT itself is not a script that will configure your ACI fabric, but is instead a library that contains ReST calls that will configure the most common deployment scenarios. In addition to the library itself, I have created a very simple script to ingest a spreadsheet that contains the actual configuration data and pass the data to the appropriate method in the library.
+The result of this frustration is the ACIPDT. My intention is to re-create the functionality that I have used Postman for in Python. In doing so, the goal is to have a single spreadsheet (source of data, could be anything, but a spreadsheet is easy), to run a single script, and to have valuable feedback about the success or failure of each and every POST. ACIPDT itself is not a script that will configure your ACI fabric, but is instead a library that will generate ReST calls that will configure the most common deployment scenarios. In addition to the library itself, I have created a very simple script to ingest a spreadsheet that contains the actual configuration data and pass the data to the appropriate method in the library.
 
 Key features:
 - Have a library that is de-coupled from any deployment type of script.
@@ -30,8 +34,10 @@ I believe the code to be relatively straight-forward (and I am very not good at 
 
 ## Getting Started
 
-To get started, unzip the zip file and place the entire contents in a directory in your Python path. For me (using OSX), I placed the folder in /usr/local/lib/python2.7/. You can then import as outlined in the code example above.
+This code is entirely written and supported in Python 3 only. The easiest way to get started is to have Python 3 and PIP3 installed and simply install it as follows:
+
+pip3 install git+https://github.com/carlniger/acitool
 
 ## Disclaimer
 
-This is NOT fancy code. It is probably not even "good" code. It does work (for me at least!) though. 
+This is NOT fancy code. It is probably not even "good" code. It does work (for me at least!) though. You can seriously mess up your ACI fabric with this utility if you don't know what you're doing. I take no responsibility for that :)
