@@ -1,0 +1,40 @@
+{
+  "infraSpineP": {
+    "attributes": {
+      "descr": "",
+      "dn": "uni/infra/spprof-{{name}}",
+      "name": "{{name}}",
+      "status": "{{status}}"
+    },
+    "children": [
+      {
+        "infraSpineS": {
+          "attributes": {
+            "descr": "",
+            "name": "{{spine_sel_name}}",
+            "type": "range"
+          },
+          "children": [
+            {
+              "infraNodeBlk": {
+                "attributes": {
+                  "descr": "",
+                  "name": "{{spine_sel_name}}",
+                  "from_": "{{id}}",
+                  "to_": "{{id}}"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "infraRsSpAccPortP": {
+          "attributes": {
+            "tDn": "uni/infra/spaccportprof-{{int_sel}}"
+          }
+        }
+      }
+    ]
+  }
+}

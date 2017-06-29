@@ -1,0 +1,42 @@
+{
+  "infraSpAccPortP": {
+    "attributes": {
+      "descr": "",
+      "dn": "uni/infra/spaccportprof-{{name}}",
+      "name": "{{name}}",
+      "status": "{{status}}"
+    },
+    "children": [
+      {
+        "infraSHPortS": {
+          "attributes": {
+            "descr": "",
+            "name": "{{port_name}}",
+            "type": "range"
+          },
+          "children": [
+            {
+              "infraPortBlk": {
+                "attributes": {
+                  "descr": "",
+                  "fromCard": "{{mod_start}}",
+                  "fromPort": "{{port_start}}",
+                  "name": "block2",
+                  "toCard": "{{mod_end}}",
+                  "toPort": "{{port_end}}"
+                }
+              }
+            },
+            {
+              "infraRsSpAccGrp": {
+                "attributes": {
+                  "tDn": "uni/infra/funcprof/spaccportgrp-{{pol_grp}}"
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

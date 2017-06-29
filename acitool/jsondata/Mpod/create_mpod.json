@@ -1,0 +1,93 @@
+{
+  "fvFabricExtConnP": {
+    "attributes": {
+      "descr": "",
+      "dn": "uni/tn-infra/fabricExtConnP-{{conn_id}}",
+      "id": "{{conn_id}}",
+      "name": "{{name}}",
+      "rt": "{{rt}}",
+      "status": "{{status}}"
+    },
+    "children": [
+      {
+        "fvPodConnP": {
+          "attributes": {
+            "descr": "",
+            "id": "1",
+            "name": ""
+          },
+          "children": [
+            {
+              "fvIp": {
+                "attributes": {
+                  "addr": "{{pod1_dtep}}"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "fvPodConnP": {
+          "attributes": {
+            "descr": "",
+            "id": "2",
+            "name": ""
+          },
+          "children": [
+            {
+              "fvIp": {
+                "attributes": {
+                  "addr": "{{pod2_dtep}}"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "l3extFabricExtRoutingP": {
+          "attributes": {
+            "descr": "",
+            "name": "{{route_prof_name}}"
+          },
+          "children": [
+            {
+              "l3extSubnet": {
+                "attributes": {
+                  "aggregate": "",
+                  "descr": "",
+                  "ip": "{{subnet1}}",
+                  "name": "",
+                  "scope": "import-security"
+                }
+              }
+            },
+            {
+              "l3extSubnet": {
+                "attributes": {
+                  "aggregate": "",
+                  "descr": "",
+                  "ip": "{{subnet2}}",
+                  "name": "",
+                  "scope": "import-security"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "fvPeeringP": {
+          "attributes": {
+            "descr": "",
+            "name": "",
+            "ownerKey": "",
+            "ownerTag": "",
+            "type": "automatic_with_full_mesh"
+          }
+        }
+      }
+    ]
+  }
+}

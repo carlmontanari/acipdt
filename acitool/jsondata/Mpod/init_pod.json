@@ -1,0 +1,11 @@
+{
+  "fabricSetupP": {
+    "attributes": {
+      "dn": "uni/controller/setuppol/setupp-{{pod_id}}",
+      "podId": "{{pod_id}}",
+      "tepPool": "{{tep_pool}}",
+      "status": "{{status}}"
+    },
+    "children": []
+  }
+}

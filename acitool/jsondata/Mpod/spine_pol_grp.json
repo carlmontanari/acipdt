@@ -1,0 +1,33 @@
+{
+  "infraSpAccPortGrp": {
+    "attributes": {
+      "descr": "",
+      "dn": "uni/infra/funcprof/spaccportgrp-{{name}}",
+      "name": "{{name}}",
+      "status": "{{status}}"
+    },
+    "children": [
+      {
+        "infraRsCdpIfPol": {
+          "attributes": {
+            "tnCdpIfPolName": "{{cdp}}"
+          }
+        }
+      },
+      {
+        "infraRsAttEntP": {
+          "attributes": {
+            "tDn": "uni/infra/attentp-{{aep}}"
+          }
+        }
+      },
+      {
+        "infraRsHIfPol": {
+          "attributes": {
+            "tnFabricHIfPolName": "{{int}}"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "l3extOut": {
+    "attributes": {
+      "dn": "uni/tn-infra/out-multipod",
+      "name": "multipod",
+      "rn": "out-multipod",
+      "status": "{{status}}"
+    },
+    "children": [
+      {
+        "bgpExtP": {
+          "attributes": {
+            "dn": "uni/tn-infra/out-multipod/bgpExtP",
+            "rn": "bgpExtP",
+            "status": "{{status}}"
+          },
+          "children": []
+        }
+      },
+      {
+        "l3extInstP": {
+          "attributes": {
+            "dn": "uni/tn-infra/out-multipod/instP-multipod",
+            "name": "multipod",
+            "status": "{{status}}",
+            "rn": "instP-multipod"
+          },
+          "children": []
+        }
+      },
+      {
+        "l3extLNodeP": {
+          "attributes": {
+            "dn": "uni/tn-infra/out-multipod/lnodep-bSpine",
+            "name": "bSpine",
+            "rn": "lnodep-bSpine",
+            "status": "{{status}}"
+          },
+          "children": [
+            {
+              "l3extLIfP": {
+                "attributes": {
+                  "dn": "uni/tn-infra/out-multipod/lnodep-bSpine/lifp-portIf",
+                  "name": "portIf",
+                  "rn": "lifp-portIf",
+                  "status": "{{status}}"
+                },
+                "children": [
+                  {
+                    "ospfIfP": {
+                      "attributes": {
+                        "dn": "uni/tn-infra/out-multipod/lnodep-bSpine/lifp-portIf/ospfIfP",
+                        "rn": "ospfIfP",
+                        "status": "{{status}}"
+                      }
+                    }
+                  },
+                  {
+                    "l3extRsPathL3OutAtt": {
+                      "attributes": {
+                        "dn": "uni/tn-infra/out-multipod/lnodep-bSpine/lifp-portIf/rspathL3OutAtt-[topology/pod-1/paths-{{pod1_spine1}}/pathep-[eth{{pod1_spine1_int1}}]]",
+                        "encap": "vlan-4",
+                        "ifInstT": "sub-interface",
+                        "tDn": "topology/pod-1/paths-{{pod1_spine1}}/pathep-[eth{{pod1_spine1_int1}}]",
+                        "addr": "{{pod1_spine1_int1_ip}}",
+                        "mac": "00:22:BD:F8:19:FF",
+                        "rn": "rspathL3OutAtt-[topology/pod-1/paths-{{pod1_spine1}}/pathep-[eth{{pod1_spine1_int1}}]]",
+                        "status": "{{status}}"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "l3extRsPathL3OutAtt": {
+                      "attributes": {
+                        "dn": "uni/tn-infra/out-multipod/lnodep-bSpine/lifp-portIf/rspathL3OutAtt-[topology/pod-2/paths-{{pod2_spine1}}/pathep-[eth{{pod2_spine1_int1}}]]",
+                        "encap": "vlan-4",
+                        "ifInstT": "sub-interface",
+                        "tDn": "topology/pod-2/paths-{{pod2_spine1}}/pathep-[eth{{pod2_spine1_int1}}]",
+                        "addr": "{{pod2_spine1_int1_ip}}",
+                        "mac": "00:22:BD:F8:19:FF",
+                        "rn": "rspathL3OutAtt-[topology/pod-2/paths-{{pod2_spine1}}/pathep-[eth{{pod2_spine1_int1}}]]",
+                        "status": "{{status}}"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "l3extRsNodeL3OutAtt": {
+                "attributes": {
+                  "dn": "uni/tn-infra/out-multipod/lnodep-bSpine/rsnodeL3OutAtt-[topology/pod-1/node-{{pod1_spine1}}]",
+                  "tDn": "topology/pod-1/node-{{pod1_spine1}}",
+                  "rtrId": "{{pod1_spine1_rtrid}}",
+                  "rn": "rsnodeL3OutAtt-[topology/pod-1/node-{{pod1_spine1}}]",
+                  "status": "{{status}}"
+                },
+                "children": [
+                  {
+                    "l3extInfraNodeP": {
+                      "attributes": {
+                        "status": "created"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "l3extLoopBackIfP": {
+                      "attributes": {
+                        "dn": "uni/tn-infra/out-multipod/lnodep-bSpine/rsnodeL3OutAtt-[topology/pod-1/node-{{pod1_spine1}}]/lbp-[{{pod1_spine1_rtrid}}]",
+                        "addr": "{{pod1_spine1_rtrid}}",
+                        "status": "{{status}}"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "l3extRsNodeL3OutAtt": {
+                "attributes": {
+                  "dn": "uni/tn-infra/out-multipod/lnodep-bSpine/rsnodeL3OutAtt-[topology/pod-2/node-{{pod2_spine1}}]",
+                  "tDn": "topology/pod-2/node-{{pod2_spine1}}",
+                  "rtrId": "{{pod2_spine1_rtrid}}",
+                  "rn": "rsnodeL3OutAtt-[topology/pod-2/node-{{pod2_spine1}}]",
+                  "status": "{{status}}"
+                },
+                "children": [
+                  {
+                    "l3extInfraNodeP": {
+                      "attributes": {
+                        "status": "{{status}}"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "l3extLoopBackIfP": {
+                      "attributes": {
+                        "dn": "uni/tn-infra/out-multipod/lnodep-bSpine/rsnodeL3OutAtt-[topology/pod-2/node-{{pod2_spine1}}]/lbp-[{{pod2_spine1_rtrid}}]",
+                        "addr": "{{pod2_spine1_rtrid}}",
+                        "status": "{{status}}"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "ospfExtP": {
+          "attributes": {
+            "dn": "uni/tn-infra/out-multipod/ospfExtP",
+            "areaType": "regular",
+            "rn": "ospfExtP",
+            "status": "{{status}}"
+          },
+          "children": []
+        }
+      },
+      {
+        "l3extRsEctx": {
+          "attributes": {
+            "tnFvCtxName": "overlay-1",
+            "status": "{{status}}"
+          },
+          "children": []
+        }
+      },
+      {
+        "bgpRtTargetInstrP": {
+          "attributes": {
+            "dn": "uni/tn-infra/out-multipod/rttargetinstrp",
+            "rn": "rttargetinstrp",
+            "status": "{{status}}"
+          },
+          "children": []
+        }
+      }
+    ]
+  }
+}
