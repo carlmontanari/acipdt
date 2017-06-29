@@ -1,0 +1,8 @@
+{
+    "fabricRsPodPGrp": {
+        "attributes": {
+            "tDn": "uni/fabric/funcprof/podpgrp-{{name}}",
+            "status": "created,modified"
+        }
+    }
+}

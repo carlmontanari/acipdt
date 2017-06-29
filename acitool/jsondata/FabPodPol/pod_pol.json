@@ -1,0 +1,59 @@
+{
+    "fabricPodPGrp": {
+        "attributes": {
+            "dn": "uni/fabric/funcprof/podpgrp-{{name}}",
+            "name": "{{name}}",
+            "status": "{{status}}"
+        },
+        "children": [
+            {
+                "fabricRsTimePol": {
+                    "attributes": {
+                        "tnDatetimePolName": "default",
+                        "status": "created,modified"
+                    }
+                }
+            },
+            {
+                "fabricRsPodPGrpIsisDomP": {
+                    "attributes": {
+                        "tnIsisDomPolName": "default",
+                        "status": "created,modified"
+                    }
+                }
+            },
+            {
+                "fabricRsPodPGrpCoopP": {
+                    "attributes": {
+                        "tnCoopPolName": "default",
+                        "status": "created,modified"
+                    }
+                }
+            },
+            {
+                "fabricRsPodPGrpBGPRRP": {
+                    "attributes": {
+                        "tnBgpInstPolName": "default",
+                        "status": "created,modified"
+                    }
+                }
+            },
+            {
+                "fabricRsCommPol": {
+                    "attributes": {
+                        "tnCommPolName": "default",
+                        "status": "created,modified"
+                    }
+                }
+            },
+            {
+                "fabricRsSnmpPol": {
+                    "attributes": {
+                        "tnSnmpPolName": "default",
+                        "status": "created,modified"
+                    }
+                }
+            }
+        ]
+    }
+}

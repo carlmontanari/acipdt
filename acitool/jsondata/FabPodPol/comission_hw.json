@@ -1,0 +1,42 @@
+{
+    "polUni": {
+        "attributes": {
+            "dn": "uni"
+        },
+        "children": [
+            {
+                "ctrlrInst": {
+                    "attributes": {
+                        "ownerKey": "",
+                        "ownerTag": ""
+                    },
+                    "children": [
+                        {
+                            "fabricNodeIdentPol": {
+                                "attributes": {
+                                    "name": "default",
+                                    "ownerKey": "",
+                                    "ownerTag": ""
+                                },
+                                "children": [
+                                    {
+                                        "fabricNodeIdentP": {
+                                            "attributes": {
+                                                "name": "{{name}}",
+                                                "nodeId": "{{id}}",
+                                                "serial": "{{serial}}",
+                                                "descr": "{{descr}}",
+                                                "fabricId": "{{fabric}}",
+                                                "podId": "{{pod}}"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

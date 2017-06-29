@@ -1,0 +1,31 @@
+{
+    "dnsProfile": {
+        "attributes": {
+            "dn": "uni/fabric/dnsp-default",
+            "name": "default",
+            "status": "created,modified"
+        },
+        "children": [
+            {
+                "dnsProv": {
+                    "attributes": {
+                        "addr": "{{address}}",
+                        "preferred": "{{preferred}}",
+                        "status": "{{status}}",
+                        "rn": "prov-[{{address}}]"
+                    }
+                }
+            },
+            {
+                "dnsDomain": {
+                    "attributes": {
+                        "isDefault": "{{domain_default}}",
+                        "name": "{{domain}}",
+                        "rn": "dom-{{domain}}",
+                        "status": "{{domain_status}}"
+                    }
+                }
+            }
+        ]
+    }
+}

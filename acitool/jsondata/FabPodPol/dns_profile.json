@@ -1,0 +1,8 @@
+{
+    "dnsRsProfileToEpg": {
+        "attributes": {
+            "tDn": "uni/tn-mgmt/mgmtp-default/oob-default",
+            "status": "created,modified"
+        }
+    }
+}

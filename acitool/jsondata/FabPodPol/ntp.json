@@ -1,0 +1,20 @@
+{
+    "datetimeNtpProv": {
+        "attributes": {
+            "dn": "uni/fabric/time-default/ntpprov-{{address}}",
+            "name": "{{address}}",
+            "rn": "ntpprov-{{address}}",
+            "status": "{{status}}"
+        },
+        "children": [
+            {
+                "datetimeRsNtpProvToEpg": {
+                    "attributes": {
+                        "tDn": "uni/tn-mgmt/mgmtp-default/oob-default",
+                        "status": "created,modified"
+                    }
+                }
+            }
+        ]
+    }
+}

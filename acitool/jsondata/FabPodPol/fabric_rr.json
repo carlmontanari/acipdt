@@ -1,0 +1,10 @@
+{
+    "bgpRRNodePEp": {
+        "attributes": {
+            "dn": "uni/fabric/bgpInstP-default/rr/node-{{rr}}",
+            "id": "{{rr}}",
+            "rn": "node-{{rr}}",
+            "status": "{{status}}"
+        }
+    }
+}

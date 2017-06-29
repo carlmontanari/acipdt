@@ -1,0 +1,10 @@
+{
+    "bgpAsP": {
+        "attributes": {
+            "dn": "uni/fabric/bgpInstP-default/as",
+            "asn": "{{asn}}",
+            "rn": "as",
+            "status": "{{status}}"
+        }
+    }
+}
