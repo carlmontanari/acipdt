@@ -1,0 +1,8 @@
+{
+  "infraRsDomP": {
+    "attributes": {
+      "tDn": "uni/vmmp-VMware/dom-{{name}}",
+      "status": "{{status}}"
+    }
+  }
+}

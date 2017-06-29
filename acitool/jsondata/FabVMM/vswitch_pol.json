@@ -1,0 +1,26 @@
+{
+  "vmmVSwitchPolicyCont": {
+    "attributes": {
+      "dn": "uni/vmmp-VMware/dom-{{name}}-vCenter/vswitchpolcont",
+      "status": "{{status}}"
+    },
+    "children": [
+      {
+        "vmmRsVswitchOverrideCdpIfPol": {
+          "attributes": {
+            "tDn": "uni/infra/cdpIfP-{{name}}-{{cdp_pol}}",
+            "status": "{{status}}"
+          }
+        }
+      },
+      {
+        "vmmRsVswitchOverrideLldpIfPol": {
+          "attributes": {
+            "tDn": "uni/infra/lldpIfP-{{name}}-{{lldp_pol}}",
+            "status": "{{status}}"
+          }
+        }
+      }
+    ]
+  }
+}

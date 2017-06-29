@@ -1,0 +1,62 @@
+{
+  "vmmDomP": {
+    "attributes": {
+      "dn": "uni/vmmp-VMware/dom-{{name}}",
+      "name": "{{name}}",
+      "rn": "dom-{{name}}",
+      "status": "{{status}}"
+    },
+    "children": [
+      {
+        "vmmCtrlrP": {
+          "attributes": {
+            "dn": "uni/vmmp-VMware/dom-{{name}}/ctrlr-{{name}}",
+            "name": "{{name}}",
+            "hostOrIp": "{{host}}",
+            "rootContName": "{{dc}}",
+            "rn": "ctrlr-{{name}}",
+            "status": "{{status}}"
+          },
+          "children": [
+            {
+              "vmmRsAcc": {
+                "attributes": {
+                  "tDn": "uni/vmmp-VMware/dom-{{name}}/usracc-Credentials",
+                  "status": "{{status}}"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "infraRsVlanNs": {
+          "attributes": {
+            "tDn": "uni/infra/vlanns-[{{vl_pool}}]-dynamic",
+            "status": "{{status}}"
+          }
+        }
+      },
+      {
+        "vmmUsrAccP": {
+          "attributes": {
+            "dn": "uni/vmmp-VMware/dom-{{name}}/usracc-Credentials",
+            "name": "Credentials",
+            "usr": "{{user}}",
+            "pwd": "{{pwd}}",
+            "rn": "usracc-Credentials",
+            "status": "{{status}}"
+          }
+        }
+      },
+      {
+        "vmmVSwitchPolicyCont": {
+          "attributes": {
+            "dn": "uni/vmmp-VMware/dom-{{name}}/vswitchpolcont",
+            "status": "created,modified"
+          }
+        }
+      }
+    ]
+  }
+}
