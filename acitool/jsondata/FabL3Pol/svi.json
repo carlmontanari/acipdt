@@ -1,0 +1,57 @@
+{
+    "l3extLIfP": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/out-{{name}}/lnodep-{{node_name}}/lifp-{{int_profile}}",
+            "name": "{{int_profile}}",
+            "status": "{{int_profile_status}}"
+        },
+        "children": [
+            {
+                "l3extRsNdIfPol": {
+                    "attributes": {
+                        "status": "created,modified"
+                    }
+                }
+            },
+            {
+                "l3extRsPathL3OutAtt": {
+                    "attributes": {
+                        "encap": "vlan-{{vlan}}",
+                        "ifInstT": "ext-svi",
+                        "llAddr": "::",
+                        "mac": "00:22:BD:F8:19:FF",
+                        "mode": "regular",
+                        "mtu": "inherit",
+                        "status": "{{status}}",
+                        "tDn": "topology/pod-{{pod}}/protpaths-{{sw1}}-{{sw2}}/pathep-[{{vpc}}]",
+                        "targetDscp": "unspecified"
+                    },
+                    "children": [
+                        {
+                            "l3extMember": {
+                                "attributes": {
+                                    "addr": "{{sw2_ip}}",
+                                    "llAddr": "::",
+                                    "rn": "mem-B",
+                                    "side": "B",
+                                    "status": "created,modified"
+                                }
+                            }
+                        },
+                        {
+                            "l3extMember": {
+                                "attributes": {
+                                    "addr": "{{sw1_ip}}",
+                                    "llAddr": "::",
+                                    "rn": "mem-A",
+                                    "side": "A",
+                                    "status": "created,modified"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

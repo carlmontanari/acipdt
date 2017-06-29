@@ -1,0 +1,33 @@
+{
+    "l3extLIfP": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/out-{{name}}/lnodep-{{node_name}}/lifp-{{int_profile}}",
+            "name": "{{int_profile}}",
+            "status": "{{int_profile_status}}"
+        },
+        "children": [
+            {
+                "l3extRsNdIfPol": {
+                    "attributes": {
+                    "status": "created,modified"
+                    }
+                }
+            },
+            {
+                "l3extRsPathL3OutAtt": {
+                    "attributes": {
+                        "addr": "{{ip}}",
+                        "encap": "vlan-{{vlan}}",
+                        "ifInstT": "sub-interface",
+                        "llAddr": "::",
+                        "mac": "00:22:BD:F8:19:FF",
+                        "mode": "regular",
+                        "mtu": "inherit",
+                        "rn": "rspathL3OutAtt-[topology/pod-{{pod}}/paths-{{sw}}/pathep-[eth1/{{port}}]]",
+                        "status": "{{status}}"
+                    }
+                }
+            }
+        ]
+    }
+}

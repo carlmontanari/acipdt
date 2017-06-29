@@ -1,0 +1,55 @@
+{
+    "l3extLNodeP": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/out-{{name}}/lnodep-{{node_name}}",
+            "name": "{{node_name}}",
+            "status": "{{status}}",
+            "tag": "yellow-green",
+            "targetDscp": "unspecified"
+        },
+        "children": [
+            {
+                "l3extRsNodeL3OutAtt": {
+                    "attributes": {
+                        "rn": "rsnodeL3OutAtt-[topology/pod-{{pod}}/node-{{sw1}}]",
+                        "rtrId": "{{sw1_loop}}",
+                        "rtrIdLoopBack": "{{loopback}}",
+                        "status": "created,modified"
+                    },
+                    "children": [
+                        {
+                            "l3extLoopBackIfP": {
+                                "attributes": {
+                                    "addr": "{{sw1_loop}}",
+                                    "rn": "lbp-[{{sw1_loop}}]",
+                                    "status": "created,modified"
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "l3extRsNodeL3OutAtt": {
+                    "attributes": {
+                        "rn": "rsnodeL3OutAtt-[topology/pod-{{pod}}/node-{{sw2}}]",
+                        "rtrId": "{{sw2_loop}}",
+                        "rtrIdLoopBack": "{{loopback}}",
+                        "status": "created,modified"
+                    },
+                    "children": [
+                        {
+                            "l3extLoopBackIfP": {
+                                "attributes": {
+                                    "addr": "{{sw2_loop}}",
+                                    "rn": "lbp-[{{sw2_loop}}]",
+                                    "status": "created,modified"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

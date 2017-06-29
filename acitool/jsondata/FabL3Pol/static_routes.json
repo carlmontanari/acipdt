@@ -1,0 +1,32 @@
+{
+    "l3extRsNodeL3OutAtt": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/out-{{name}}/lnodep-{{node_name}}/rsnodeL3OutAtt-[topology/pod-{{pod}}/node-{{sw}}]",
+            "status": "created,modified"
+        },
+        "children": [
+            {
+                "ipRouteP": {
+                    "attributes": {
+                        "aggregate": "no",
+                        "ip": "{{prefix}}",
+                        "pref": "1",
+                        "rn": "rt-[{{prefix}}]",
+                        "status": "{{status}}"
+                    },
+                    "children": [
+                        {
+                            "ipNexthopP": {
+                                "attributes": {
+                                    "nhAddr": "{{next_hop}}",
+                                    "rn": "nh-[{{next_hop}}]",
+                                    "status": "{{status}}"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

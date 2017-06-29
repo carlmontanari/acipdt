@@ -1,0 +1,21 @@
+{
+    "{{pol_type}}IfP": {
+        "attributes": {
+            "authKeyId": "1",
+            "authType": "none",
+            "dn": "uni/tn-{{tn_name}}/out-{{name}}/lnodep-{{node_name}}/lifp-{{int_profile}}/{{pol_type}}IfP",
+            "status": "{{status}}"
+        },
+        "children": [
+            {
+                "ospfRsIfPol": {
+                    "attributes": {
+                        "rn": "rsIfPol",
+                        "status": "{{status}}",
+                        "tnOspfIfPolName": "{{pol_name}}"
+                    }
+                }
+            }
+        ]
+    }
+}

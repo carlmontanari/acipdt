@@ -1,0 +1,54 @@
+{
+    "l3extLNodeP": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/out-{{name}}/lnodep-{{node_name}}",
+            "name": "{{node_name}}",
+            "status": "created,modified"
+        },
+        "children": [
+            {
+                "bgpPeerP": {
+                    "attributes": {
+                        "addr": "{{peer}}",
+                        "allowedSelfAsCnt": "3",
+                        "ctrl": "",
+                        "peerCtrl": "",
+                        "rn": "peerP-[{{peer}}]",
+                        "status": "{{status}}",
+                        "ttl": "1"
+                    },
+                    "children": [
+                        {
+                            "bgpRsPeerPfxPol": {
+                                "attributes": {
+                                    "rn": "rspeerPfxPol",
+                                    "status": "created,modified",
+                                    "tnBgpPeerPfxPolName": ""
+                                }
+                            }
+                        },
+                        {
+                            "bgpLocalAsnP": {
+                                "attributes": {
+                                    "asnPropagate": "none",
+                                    "localAsn": "{{local_asn}}",
+                                    "rn": "localasn",
+                                    "status": "created,modified"
+                                }
+                            }
+                        },
+                        {
+                            "bgpAsP": {
+                                "attributes": {
+                                    "asn": "{{remote_asn}}",
+                                    "rn": "as",
+                                    "status": "created,modified"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

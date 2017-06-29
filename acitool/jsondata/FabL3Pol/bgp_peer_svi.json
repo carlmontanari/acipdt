@@ -1,0 +1,63 @@
+{
+    "l3extLIfP": {
+        "attributes": {
+            "name": "{{int_profile}}",
+            "status": "created,modified"
+        },
+        "children": [
+            {
+                "l3extRsPathL3OutAtt": {
+                    "attributes": {
+                        "rn": "rspathL3OutAtt-[topology/pod-{{pod}}/protpaths-{{sw1}}-{{sw2}}/pathep-[{{vpc}}]]",
+                        "status": "created,modified"
+                    },
+                    "children": [
+                        {
+                            "bgpPeerP": {
+                                "attributes": {
+                                    "addr": "{{peer}}",
+                                    "allowedSelfAsCnt": "3",
+                                    "ctrl": "",
+                                    "peerCtrl": "",
+                                    "rn": "peerP-[{{peer}}]",
+                                    "status": "{{status}}",
+                                    "ttl": "1"
+                                },
+                                "children": [
+                                    {
+                                        "bgpRsPeerPfxPol": {
+                                            "attributes": {
+                                                "rn": "rspeerPfxPol",
+                                                "status": "",
+                                                "tnBgpPeerPfxPolName": ""
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "bgpLocalAsnP": {
+                                            "attributes": {
+                                                "asnPropagate": "none",
+                                                "localAsn": "{{local_asn}}",
+                                                "rn": "localasn",
+                                                "status": "created,modified"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "bgpAsP": {
+                                            "attributes": {
+                                                "asn": "{{remote_asn}}",
+                                                "rn": "as",
+                                                "status": "created,modified"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

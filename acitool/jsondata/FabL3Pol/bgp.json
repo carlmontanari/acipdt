@@ -1,0 +1,20 @@
+{
+    "l3extOut": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/out-{{name}}",
+            "enforceRtctrl": "export",
+            "name": "{{name}}",
+            "status": "created,modified"
+        },
+        "children": [
+            {
+                "bgpExtP": {
+                    "attributes": {
+                        "rn": "bgpExtP",
+                        "status": "{{status}}"
+                    }
+                }
+            }
+        ]
+    }
+}

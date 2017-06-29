@@ -1,0 +1,17 @@
+{
+    "ospfIfPol": {
+        "attributes": {
+            "cost": "unspecified",
+            "ctrl": "mtu-ignore",
+            "deadIntvl": "{{dead}}",
+            "dn": "uni/tn-{{tn_name}}/ospfIfPol-{{pol_name}}",
+            "helloIntvl": "{{hello}}",
+            "name": "{{pol_name}}",
+            "nwT": "{{net_type}}",
+            "prio": "1",
+            "rexmitIntvl": "5",
+            "status": "{{status}}",
+            "xmitDelay": "1"
+        }
+    }
+}

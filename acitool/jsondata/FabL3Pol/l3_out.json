@@ -1,0 +1,30 @@
+{
+    "l3extOut": {
+        "attributes": {
+            "enforceRtctrl": "export",
+            "name": "{{name}}",
+            "status": "{{status}}",
+            "targetDscp": "unspecified"
+        },
+        "children": [
+            {
+                "l3extRsEctx": {
+                    "attributes": {
+                        "rn": "rsectx",
+                        "status": "{{status}}",
+                        "tnFvCtxName": "{{vrf}}"
+                    }
+                }
+            },
+            {
+                "l3extRsL3DomAtt": {
+                    "attributes": {
+                        "rn": "rsl3DomAtt",
+                        "status": "{{status}}",
+                        "tDn": "uni/l3dom-{{domain}}"
+                    }
+                }
+            }
+        ]
+    }
+}
