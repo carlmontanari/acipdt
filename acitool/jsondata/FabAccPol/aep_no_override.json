@@ -1,0 +1,56 @@
+            {
+                "infraAttEntityP": {
+                    "attributes": {
+                        "dn": "uni/infra/attentp-{{name}}",
+                        "name": "{{name}}",
+                        "status": "{{status}}"
+                    },
+                    "children": [
+                        {
+                            "infraContNS": {
+                                "attributes": {
+                                    "rn": "nscont",
+                                    "status": "{{status}}"
+                                }
+                            }
+                        },
+                        {
+                            "infraContDomP": {
+                                "attributes": {
+                                    "rn": "dompcont",
+                                    "status": "{{status}}"
+                                }
+                            }
+                        },
+                        {
+                            "infraProvAcc": {
+                                "attributes": {
+                                    "name": "default",
+                                    "rn": "provacc",
+                                    "status": "{{infra}}"
+                                },
+                                "children": [
+                                    {
+                                        "dhcpInfraProvP": {
+                                            "attributes": {
+                                                "mode": "controller",
+                                                "rn": "infraprovp",
+                                                "status": "{{infra}}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "infraRsFuncToEpg": {
+                                            "attributes": {
+                                                "encap": "vlan-{{infra_vlan}}",
+                                                "rn": "rsfuncToEpg-[uni/tn-infra/ap-access/epg-default]",
+                                                "status": "{{infra}}"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }

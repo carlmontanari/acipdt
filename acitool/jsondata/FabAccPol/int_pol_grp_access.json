@@ -1,0 +1,75 @@
+{
+    "infraAccPortGrp": {
+        "attributes": {
+            "dn": "uni/infra/funcprof/accportgrp-{{name}}",
+            "name": "{{name}}",
+            "rn": "accportgrp-{{name}}",
+            "status": "{{status}}"
+        },
+        "children": [
+            {
+                "infraRsMonIfInfraPol": {
+                    "attributes": {
+                        "tnMonInfraPolName": ""
+                    }
+                }
+            },
+            {
+                "infraRsLldpIfPol": {
+                    "attributes": {
+                        "tnLldpIfPolName": "{{lldp}}"
+                    }
+                }
+            },
+            {
+                "infraRsStpIfPol": {
+                    "attributes": {
+                        "tnStpIfPolName": ""
+                    }
+                }
+            },
+            {
+                "infraRsCdpIfPol": {
+                    "attributes": {
+                        "tnCdpIfPolName": "{{cdp}}"
+                    }
+                }
+            },
+            {
+                "infraRsAttEntP": {
+                    "attributes": {
+                        "tDn": "uni/infra/attentp-{{aep}}"
+                    }
+                }
+            },
+            {
+                "infraRsMcpIfPol": {
+                    "attributes": {
+                        "tnMcpIfPolName": "{{mcp}}"
+                    }
+                }
+            },
+            {
+                "infraRsL2IfPol": {
+                    "attributes": {
+                        "tnL2IfPolName": "{{ppv}}"
+                    }
+                }
+            },
+            {
+                "infraRsStormctrlIfPol": {
+                    "attributes": {
+                        "tnStormctrlIfPolName": "{{storm}}"
+                    }
+                }
+            },
+            {
+                "infraRsHIfPol": {
+                    "attributes": {
+                        "tnFabricHIfPolName": "{{link}}"
+                    }
+                }
+            }
+        ]
+    }
+}

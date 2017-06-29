@@ -1,0 +1,22 @@
+{
+    "fvnsVlanInstP": {
+        "attributes": {
+            "allocMode": "{{mode}}",
+            "dn": "uni/infra/vlanns-[{{name}}]-{{mode}}",
+            "name": "{{name}}",
+            "status": "{{status}}"
+        },
+        "children": [
+            {
+                "fvnsEncapBlk": {
+                    "attributes": {
+                        "allocMode": "{{range_mode}}",
+                        "from": "vlan-{{start}}",
+                        "to": "vlan-{{end}}",
+                        "status": "{{status}}"
+                    }
+                }
+            }
+        ]
+    }
+}

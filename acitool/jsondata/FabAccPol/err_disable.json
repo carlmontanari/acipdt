@@ -1,0 +1,8 @@
+{
+    "edrEventP": {
+        "attributes": {
+            "dn": "uni/infra/edrErrDisRecoverPol-default/edrEventP-event-{{event}}",
+            "recover": "{{state}}"
+        }
+    }
+}

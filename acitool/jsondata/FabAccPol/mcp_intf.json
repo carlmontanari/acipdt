@@ -1,0 +1,10 @@
+{
+    "mcpIfPol": {
+        "attributes": {
+            "dn": "uni/infra/mcpIfP-{{name}}",
+            "name": "{{name}}",
+            "status": "{{status}}",
+            "adminSt": "{{state}}"
+        }
+    }
+}

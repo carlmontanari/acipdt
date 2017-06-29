@@ -1,0 +1,35 @@
+{
+    "infraHPortS": {
+        "attributes": {
+            "name": "{{port_name}}",
+            "rn": "hports-{{port_name}}-typ-range",
+            "status": "{{status}}",
+            "type": "range"
+        },
+        "children": [
+            {
+                "infraRsAccBaseGrp": {
+                    "attributes": {
+                        "fexId": "101",
+                        "rn": "rsaccBaseGrp",
+                        "tDn": "uni/infra/funcprof/{{port_type}}-{{pol_group}}",
+                        "status": "created,modified"
+                    }
+                }
+            },
+            {
+                "infraPortBlk": {
+                    "attributes": {
+                        "fromCard": "{{mod_start}}",
+                        "toCard": "{{mod_end}}",
+                        "fromPort": "{{port_start}}",
+                        "toPort": "{{port_end}}",
+                        "name": "block2",
+                        "rn": "portblk-block2",
+                        "status": "created,modified"
+                    }
+                }
+            }
+        ]
+    }
+}

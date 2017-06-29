@@ -1,0 +1,9 @@
+{
+    "mcpInstPol": {
+        "attributes": {
+            "dn": "uni/infra/mcpInstP-default",
+            "key": "{{password}}",
+            "adminSt": "{{state}}"
+        }
+    }
+}

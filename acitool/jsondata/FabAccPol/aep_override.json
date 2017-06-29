@@ -1,0 +1,93 @@
+{
+    "infraAttEntityP": {
+        "attributes": {
+            "dn": "uni/infra/attentp-{{name}}",
+            "name": "{{name}}",
+            "status": "{{status}}"
+        },
+        "children": [
+            {
+                "infraContNS": {
+                    "attributes": {
+                        "rn": "nscont",
+                        "status": "{{status}}"
+                    }
+                }
+            },
+            {
+                "infraContDomP": {
+                    "attributes": {
+                        "rn": "dompcont",
+                        "status": "{{status}}"
+                    }
+                }
+            },
+            {
+                "infraProvAcc": {
+                    "attributes": {
+                        "name": "default",
+                        "rn": "provacc",
+                        "status": "{{infra}}"
+                    },
+                    "children": [
+                        {
+                            "dhcpInfraProvP": {
+                                "attributes": {
+                                    "mode": "controller",
+                                    "rn": "infraprovp",
+                                    "status": "{{infra}}"
+                                }
+                            }
+                        },
+                        {
+                            "infraRsFuncToEpg": {
+                                "attributes": {
+                                    "encap": "vlan-{{infra_vlan}}",
+                                    "rn": "rsfuncToEpg-[uni/tn-infra/ap-access/epg-default]",
+                                    "status": "{{infra}}"
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "infraAttPolicyGroup": {
+                    "attributes": {
+                        "rn": "attpolgrp",
+                        "status": "{{override}}"
+                    },
+                    "children": [
+                        {
+                            "infraRsOverrideCdpIfPol": {
+                                "attributes": {
+                                    "rn": "rsoverrideCdpIfPol",
+                                    "status": "{{override}}",
+                                    "tnCdpIfPolName": "{{override_cdp}}"
+                                }
+                            }
+                        },
+                        {
+                            "infraRsOverrideLacpPol": {
+                                "attributes": {
+                                    "rn": "rsoverrideLacpPol",
+                                    "status": "{{override}}",
+                                    "tnLacpLagPolName": "{{override_pc}}"
+                                }
+                            }
+                        },
+                        {
+                            "infraRsOverrideLldpIfPol": {
+                                "attributes": {
+                                    "rn": "rsoverrideLldpIfPol",
+                                    "status": "{{override}}",
+                                    "tnLldpIfPolName": "{{override_lldp}}"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

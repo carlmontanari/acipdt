@@ -1,0 +1,20 @@
+{
+    "infraAttEntityP": {
+        "attributes": {
+            "dn": "uni/infra/attentp-{{name}}",
+            "name": "{{name}}",
+            "status": "created,modified"
+        },
+        "children": [
+            {
+                "infraRsDomP": {
+                    "attributes": {
+                        "rn": "rsdomP-[uni/l3dom-{{l3_dom}}]",
+                        "status": "{{status}}",
+                        "tDn": "uni/l3dom-{{l3_dom}}"
+                    }
+                }
+            }
+        ]
+    }
+}

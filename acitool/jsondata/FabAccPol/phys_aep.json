@@ -1,0 +1,20 @@
+{
+    "infraAttEntityP": {
+        "attributes": {
+            "dn": "uni/infra/attentp-{{name}}",
+            "name": "{{name}}",
+            "status": "created,modified"
+        },
+        "children": [
+            {
+                "infraRsDomP": {
+                    "attributes": {
+                        "rn": "rsdomP-[uni/phys-{{dom_name}}]",
+                        "status": "{{status}}",
+                        "tDn": "uni/phys-{{dom_name}}"
+                    }
+                }
+            }
+        ]
+    }
+}

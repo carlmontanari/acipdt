@@ -1,0 +1,11 @@
+{
+    "fabricHIfPol": {
+        "attributes": {
+            "dn": "uni/infra/hintfpol-{{name}}",
+            "name": "{{name}}",
+            "autoNeg": "{{auto_neg}}",
+            "speed": "{{speed}}",
+            "status": "{{status}}"
+        }
+    }
+}

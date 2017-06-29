@@ -1,0 +1,83 @@
+{
+    "infraAccBndlGrp": {
+        "attributes": {
+            "dn": "uni/infra/funcprof/accbundle-{{name}}",
+            "lagT": "{{lag_type}}",
+            "name": "{{name}}",
+            "rn": "accbundle-{{name}}",
+            "status": "{{status}}"
+        },
+        "children": [
+            {
+                "infraRsMonIfInfraPol": {
+                    "attributes": {
+                        "tnMonInfraPolName": ""
+                    }
+                }
+            },
+            {
+                "infraRsLldpIfPol": {
+                    "attributes": {
+                        "tnLldpIfPolName": "{{lldp}}"
+                    }
+                }
+            },
+            {
+                "infraRsStpIfPol": {
+                    "attributes": {
+                        "tnStpIfPolName": ""
+                    }
+                }
+            },
+            {
+                "infraRsCdpIfPol": {
+                    "attributes": {
+                        "tnCdpIfPolName": "{{cdp}}"
+                    }
+                }
+            },
+            {
+                "infraRsAttEntP": {
+                    "attributes": {
+                        "tDn": "uni/infra/attentp-{{aep}}"
+                    }
+                }
+            },
+            {
+                "infraRsMcpIfPol": {
+                    "attributes": {
+                        "tnMcpIfPolName": "{{mcp}}"
+                    }
+                }
+            },
+            {
+                "infraRsStormctrlIfPol": {
+                    "attributes": {
+                        "tnStormctrlIfPolName": "{{storm}}"
+                    }
+                }
+            },
+            {
+                "infraRsL2IfPol": {
+                    "attributes": {
+                        "tnL2IfPolName": "{{ppv}}"
+                    }
+                }
+            },
+            {
+                "infraRsLacpPol": {
+                    "attributes": {
+                        "tnLacpLagPolName": "{{lag}}"
+                    }
+                }
+            },
+            {
+                "infraRsHIfPol": {
+                    "attributes": {
+                        "tnFabricHIfPolName": "{{link}}"
+                    }
+                }
+            }
+        ]
+    }
+}

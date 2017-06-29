@@ -1,0 +1,41 @@
+{
+    "fabricExplicitGEp": {
+        "attributes": {
+            "dn": "uni/fabric/protpol/expgep-{{name}}",
+            "name": "{{name}}",
+            "id": "{{id}}",
+            "rn": "expgep-{{name}}",
+            "status": "{{status}}"
+        },
+        "children": [
+            {
+                "fabricNodePEp": {
+                    "attributes": {
+                        "dn": "uni/fabric/protpol/expgep-{{name}}/nodepep-{{sw1}}",
+                        "id": "{{sw1}}",
+                        "status": "{{status}}",
+                        "rn": "nodepep-{{sw1}}"
+                    }
+                }
+            },
+            {
+                "fabricNodePEp": {
+                    "attributes": {
+                        "dn": "uni/fabric/protpol/expgep-{{name}}/nodepep-{{sw2}}",
+                        "id": "{{sw2}}",
+                        "status": "{{status}}",
+                        "rn": "nodepep-{{sw2}}"
+                    }
+                }
+            },
+            {
+                "fabricRsVpcInstPol": {
+                    "attributes": {
+                        "tnVpcInstPolName": "default",
+                        "status": "{{status}}"
+                    }
+                }
+            }
+        ]
+    }
+}

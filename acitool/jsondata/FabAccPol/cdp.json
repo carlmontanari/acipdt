@@ -1,0 +1,11 @@
+{
+    "cdpIfPol": {
+        "attributes": {
+            "dn": "uni/infra/cdpIfP-{{name}}",
+            "name": "{{name}}",
+            "adminSt": "{{state}}",
+            "rn": "cdpIfP-{{name}}",
+            "status": "{{status}}"
+        }
+    }
+}

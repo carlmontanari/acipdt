@@ -1,0 +1,12 @@
+{
+    "lldpIfPol": {
+        "attributes": {
+            "dn": "uni/infra/lldpIfP-{{name}}",
+            "name": "{{name}}",
+            "adminRxSt": "{{state}}",
+            "adminTxSt": "{{state}}",
+            "rn": "lldpIfP-{{name}}",
+            "status": "{{status}}"
+        }
+    }
+}

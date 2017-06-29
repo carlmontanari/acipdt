@@ -1,0 +1,49 @@
+{
+    "infraNodeP": {
+        "attributes": {
+            "dn": "uni/infra/nprof-{{name}}",
+            "name": "{{name}}",
+            "rn": "nprof-{{name}}",
+            "status": "{{status}}"
+        },
+        "children": [
+            {
+                "infraLeafS": {
+                    "attributes": {
+                        "dn": "uni/infra/nprof-{{name}}/leaves-{{name}}-typ-range",
+                        "type": "range",
+                        "name": "{{name}}",
+                        "rn": "leaves-{{name}}-typ-range",
+                        "status": "{{status}}"
+                    },
+                    "children": [
+                        {
+                            "infraNodeBlk": {
+                                "attributes": {
+                                    "dn": "uni/infra/nprof-{{name}}/leaves-{{name}}-typ-range/nodeblk-L{{sw1}}",
+                                    "from_": "{{sw1}}",
+                                    "to_": "{{sw1}}",
+                                    "name": "L{{sw1}}",
+                                    "rn": "nodeblk-L{{sw1}}",
+                                    "status": "{{status}}"
+                                }
+                            }
+                        },
+                        {
+                            "infraNodeBlk": {
+                                "attributes": {
+                                    "dn": "uni/infra/nprof-{{name}}/leaves-{{name}}-typ-range/nodeblk-L{{sw2}}",
+                                    "from_": "{{sw2}}",
+                                    "to_": "{{sw2}}",
+                                    "name": "L{{sw2}}",
+                                    "rn": "nodeblk-L{{sw2}}",
+                                    "status": "{{status}}"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
