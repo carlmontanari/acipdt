@@ -1,0 +1,15 @@
+{
+  "aaaUser": {
+    "attributes": {
+      "accountStatus": "active",
+      "clearPwdHistory": "yes",
+      "dn": "uni/userext/user-{{user}}",
+      "expiration": "never",
+      "expires": "no",
+      "name": "{{user}}",
+      "pwdLifeTime": "no-password-expire",
+      "status": "created",
+      "pwd": "{{pwd}}"
+    }
+  }
+}
