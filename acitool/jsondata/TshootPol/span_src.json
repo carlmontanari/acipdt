@@ -1,0 +1,37 @@
+{
+    "spanSrcGrp": {
+        "attributes": {
+            "adminSt": "{{admin}}",
+            "dn": "uni/tn-{{tn_name}}/srcgrp-{{name}}-Group",
+            "name": "{{name}}-Group",
+            "status": "{{status}}"
+        },
+        "children": [
+            {
+                "spanSrc": {
+                    "attributes": {
+                        "dir": "{{direction}}",
+                        "name": "{{name}}"
+                    },
+                    "children": [
+                        {
+                            "spanRsSrcToEpg": {
+                                "attributes": {
+                                    "tDn": "uni/tn-{{tn_name}}/ap-{{ap}}/epg-{{epg}}"
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "spanSpanLbl": {
+                    "attributes": {
+                        "name": "{{dest}}-Group",
+                        "tag": "yellow-green"
+                    }
+                }
+            }
+        ]
+    }
+}

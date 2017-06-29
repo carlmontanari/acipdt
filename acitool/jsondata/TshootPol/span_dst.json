@@ -1,0 +1,36 @@
+{
+    "spanDestGrp": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/destgrp-{{name}}-Group",
+            "name": "{{name}}-Group",
+            "status": "{{status}}"
+        },
+        "children": [
+            {
+                "spanDest": {
+                    "attributes": {
+                        "name": "{{relay_name}}"
+                    },
+                    "children": [
+                        {
+                            "spanRsDestEpg": {
+                                "attributes": {
+                                    "dscp": "unspecified",
+                                    "finalIp": "0.0.0.0",
+                                    "flowId": "1",
+                                    "ip": "{{dest_ip}}",
+                                    "mtu": "1518",
+                                    "srcIpPrefix": "{{src_ip}}",
+                                    "tDn": "uni/tn-{{tn_dest}}/ap-{{ap}}/epg-{{epg}}",
+                                    "ttl": "64",
+                                    "ver": "ver2",
+                                    "verEnforced": "no"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
