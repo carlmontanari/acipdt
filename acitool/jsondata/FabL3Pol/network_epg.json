@@ -8,30 +8,13 @@
         },
         "children": [
             {
-                "l3extConfigOutDef": {
-                    "attributes": {
-                        "rn": "configOutDef",
-                        "status": "created,modified"
-                    }
-                }
-            },
-            {
                 "l3extSubnet": {
                     "attributes": {
                         "aggregate": "",
                         "ip": "{{subnet}}",
                         "name": "",
-                        "rn": "extsubnet-[{{subnet}}]",
                         "scope": "import-security",
                         "status": "{{subnet_status}}"
-                    }
-                }
-            },
-            {
-                "fvRsCustQosPol": {
-                    "attributes": {
-                        "status": "created,modified",
-                        "tnQosCustomPolName": ""
                     }
                 }
             }
