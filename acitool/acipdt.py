@@ -247,7 +247,7 @@ class FabPodPol(object):
 
         templateVars = process_kwargs(required_args, optional_args, **kwargs)
 
-        if not (int(templateVars['asn']) in range(1, 65535)):
+        if not (int(templateVars['asn']) in range(1, 65536)):
             raise InvalidArg('Invalid BGP ASN')
         else:
             templateVars['asn'] = int(templateVars['asn'])
