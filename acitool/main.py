@@ -261,37 +261,46 @@ def take_snapshot(apic, cookies, snapshot_name):
     payload_len = len(query_payload[1]['imdata'])
     snap_count = 0
     for x in range(0, payload_len):
-        if (query_payload[1]['imdata'][x]['configSnapshot']['attributes']
-                ['fileName'])[4:17] == snapshot_name:
-                snap_count += 1
+        try:
+            if (query_payload[1]['imdata'][x]['configSnapshot']['attributes']
+                    ['fileName'])[4:17] == snapshot_name:
+                    snap_count += 1
+        except Exception as e:
+            e = e
+            print("It seems the APIC does not support snapshots, moving on.")
+            return(None)
 
     if snap_count > 0:
-        print("A snapshot with that name ({}) already exists. Please change th"
-              "e name of the snapshot in the main.py file, or delete the exist"
-              "ing snapshot. Exiting.".format(snapshot_name))
-        sys.exit()
-    elif snap_count == 0:
-        snapshot = 'true'
-        status = 'created,modified'
-        snapshot_args = {}
-        snapshot_args['name'] = snapshot_name
-        snapshot_args['snapshot'] = snapshot
-        snapshot_args['status'] = status
-        cfgmgmt = acipdt.FabCfgMgmt(apic, cookies)
-        status = cfgmgmt.backup(**snapshot_args)
-        if status == 200:
-            print("Snapshot taken successfully, continuing.")
-            time.sleep(5)
-        else:
-            print("Snapshot failed for some reason, do you want to continue?")
-            while True:
-                user_input = input("Continue 'y' or 'n' [n]: ")
-                selection = user_input or 'n'
-                if selection.lower() == 'y':
-                    continue
-                elif selection.lower() == 'n':
-                    del_snap_pol(apic, cookies, snapshot_name)
-                    sys.exit()
+        print("A snapshot including 'acipdt_backup' already exists. Would you "
+              "like to delete this snapshot or exit?")
+        user_input = input("Delete 'd' or Exit 'q' [q]: ")
+        selection = user_input or 'q'
+        if selection.lower() == 'd':
+            del_snap_pol(apic, cookies, snapshot_name)
+        elif selection.lower() == 'q':
+            sys.exit()
+
+    snapshot = 'true'
+    status = 'created,modified'
+    snapshot_args = {}
+    snapshot_args['name'] = snapshot_name
+    snapshot_args['snapshot'] = snapshot
+    snapshot_args['status'] = status
+    cfgmgmt = acipdt.FabCfgMgmt(apic, cookies)
+    status = cfgmgmt.backup(**snapshot_args)
+    if status == 200:
+        print("Snapshot taken successfully, continuing.")
+        time.sleep(5)
+    else:
+        print("Snapshot failed for some reason, do you want to continue?")
+        while True:
+            user_input = input("Continue 'y' or 'n' [n]: ")
+            selection = user_input or 'n'
+            if selection.lower() == 'y':
+                continue
+            elif selection.lower() == 'n':
+                del_snap_pol(apic, cookies, snapshot_name)
+                sys.exit()
 
 
 def revert_snapshot(apic, cookies, snapshot_name):
@@ -368,7 +377,7 @@ def main():
     wb = read_in(usr_path)
     # Copy workbook to a RW version
     wr_wb = copy(wb)
-    take_snapshot(apic, cookies, snapshot_name)
+    snap = take_snapshot(apic, cookies, snapshot_name)
     pod_policies(apic, cookies, wb, wr_wb)
     access_policies(apic, cookies, wb, wr_wb)
     tn_policies(apic, cookies, wb, wr_wb)
@@ -378,8 +387,9 @@ def main():
     mpod_policies(apic, cookies, wb, wr_wb)
     # Save workbook to user path
     wr_wb.save('{}/ACI Deploy.xls'.format(usr_path))
-    revert_snapshot(apic, cookies, snapshot_name)
-    del_snap_pol(apic, cookies, snapshot_name)
+    if snap is not None:
+        revert_snapshot(apic, cookies, snapshot_name)
+        del_snap_pol(apic, cookies, snapshot_name)
 
 
 if __name__ == '__main__':
