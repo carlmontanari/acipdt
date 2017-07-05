@@ -1944,7 +1944,7 @@ class FabL3Pol(object):
     # sw2_ip: IP of Switch-2 in dotted-decimal
     # vlan: VLAN ID as an integer
     # vpc: Name of associated vPC
-    # int_profile_status created | created,modified | deleted of the Int Pro
+    # int_profile_status: created | created,modified | deleted of the Int Pro
     # status: created | created,modified | deleted of the Interface itself
     def svi(self, **kwargs):
         required_args = {'tn_name': '',
@@ -1958,7 +1958,7 @@ class FabL3Pol(object):
                          'sw2_ip': '',
                          'vlan': '',
                          'vpc': '',
-                         'int_profile': '',
+                         'int_profile_status': '',
                          'status': ''}
         optional_args = {}
 
@@ -1991,6 +1991,60 @@ class FabL3Pol(object):
         uri = ('mo/uni/tn-{}/out-{}/lnodep-{}/lifp-{}'
                .format(templateVars['tn_name'], templateVars['name'],
                        templateVars['node_name'], templateVars['int_profile']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # tn_name: Name of the Tenant
+    # name: The name of the L3-Out
+    # pod: ID of the pod
+    # node_name: Name of the Node Profile
+    # int_profile: Name of the Interface Profile
+    # sw1: Switch-1 ID of the switch as an integer
+    # sw2: Switch-2 ID of the switch as an integer
+    # vpc: Name of associated vPC
+    # status: created | created,modified | deleted of the VIP itself
+    def svi_vip(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'name': '',
+                         'pod': '',
+                         'node_name': '',
+                         'int_profile': '',
+                         'sw1': '',
+                         'sw2': '',
+                         'vpc': '',
+                         'vip': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if not int(templateVars['pod']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['pod'] = int(templateVars['pod'])
+        if not int(templateVars['sw1']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['sw1'] = int(templateVars['sw1'])
+        if not int(templateVars['sw2']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['sw2'] = int(templateVars['sw2'])
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "svi_vip.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/out-{}/lnodep-{}/lifp-{}/rspathL3OutAtt-[topology'
+               '/pod-{}/protpaths-{}-{}/pathep-[{}]]'
+               .format(templateVars['tn_name'], templateVars['name'],
+                       templateVars['node_name'], templateVars['int_profile'],
+                       templateVars['pod'], templateVars['sw1'],
+                       templateVars['sw2'], templateVars['vpc']))
         status = post(self.apic, payload, self.cookies, uri, template_file)
         return status
 

@@ -1,0 +1,43 @@
+{
+  "l3extRsPathL3OutAtt": {
+    "attributes": {
+      "dn": "uni/tn-{{tn_name}}/out-{{name}}/lnodep-{{node_name}}/lifp-{{int_profile}}/rspathL3OutAtt-[topology/pod-{{pod}}/protpaths-{{sw1}}-{{sw2}}/pathep-[{{vpc}}]]"
+    },
+    "children": [
+      {
+        "l3extMember": {
+          "attributes": {
+            "side": "B"
+          },
+          "children": [
+            {
+              "l3extIp": {
+                "attributes": {
+                  "addr": "{{vip}}",
+                  "status": "{{status}}"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "l3extMember": {
+          "attributes": {
+            "side": "A"
+          },
+          "children": [
+            {
+              "l3extIp": {
+                "attributes": {
+                  "addr": "{{vip}}",
+                  "status": "{{status}}"
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
