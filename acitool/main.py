@@ -290,7 +290,9 @@ def take_snapshot(apic, cookies, snapshot_name):
     status = cfgmgmt.backup(**snapshot_args)
     if status == 200:
         print("Snapshot taken successfully, continuing.")
-        time.sleep(5)
+        time.sleep(1)
+        snap = True
+        return(snap)
     else:
         print("Snapshot failed for some reason, do you want to continue?")
         while True:
