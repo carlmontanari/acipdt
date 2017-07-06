@@ -48,14 +48,6 @@
             "status": "{{status}}"
           }
         }
-      },
-      {
-        "vmmVSwitchPolicyCont": {
-          "attributes": {
-            "dn": "uni/vmmp-VMware/dom-{{name}}/vswitchpolcont",
-            "status": "created,modified"
-          }
-        }
       }
     ]
   }

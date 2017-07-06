@@ -2655,7 +2655,7 @@ class FabVMM(object):
     # Method must be called with the following kwargs.
     # name: The name of the VMM Domain
     # status: created | created,modified | deleted
-    def vmm_vswitch_pol(self, **kwargs):
+    def vswitch_pol(self, **kwargs):
         required_args = {'name': '',
                          'status': ''}
         optional_args = {'cdp_pol': 'CDP-Enabled',

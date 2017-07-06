@@ -129,6 +129,8 @@ def pod_policies(apic, cookies, wb, wr_wb):
             for x in list(var_dict[pos].keys()):
                 if var_dict[pos][x] == '':
                     del var_dict[pos][x]
+            print('Deploying line {} from sheet {}...'.format(row_num + 1,
+                                                              wr_ws.name))
             status = eval("podpol.%s(**var_dict[pos])" % func)
             wb_update(wr_ws, status, row_num)
             time.sleep(.025)
@@ -149,6 +151,8 @@ def access_policies(apic, cookies, wb, wr_wb):
             for x in list(var_dict[pos].keys()):
                 if var_dict[pos][x] == '':
                     del var_dict[pos][x]
+            print('Deploying line {} from sheet {}...'.format(row_num + 1,
+                                                              wr_ws.name))
             status = eval("accpol.%s(**var_dict[pos])" % func)
             wb_update(wr_ws, status, row_num)
             time.sleep(.025)
@@ -169,6 +173,8 @@ def tn_policies(apic, cookies, wb, wr_wb):
             for x in list(var_dict[pos].keys()):
                 if var_dict[pos][x] == '':
                     del var_dict[pos][x]
+            print('Deploying line {} from sheet {}...'.format(row_num + 1,
+                                                              wr_ws.name))
             status = eval("tnpol.%s(**var_dict[pos])" % func)
             wb_update(wr_ws, status, row_num)
             time.sleep(.025)
@@ -189,6 +195,8 @@ def l3_policies(apic, cookies, wb, wr_wb):
             for x in list(var_dict[pos].keys()):
                 if var_dict[pos][x] == '':
                     del var_dict[pos][x]
+            print('Deploying line {} from sheet {}...'.format(row_num + 1,
+                                                              wr_ws.name))
             status = eval("l3pol.%s(**var_dict[pos])" % func)
             wb_update(wr_ws, status, row_num)
             time.sleep(.025)
@@ -209,6 +217,8 @@ def vmm_policies(apic, cookies, wb, wr_wb):
             for x in list(var_dict[pos].keys()):
                 if var_dict[pos][x] == '':
                     del var_dict[pos][x]
+            print('Deploying line {} from sheet {}...'.format(row_num + 1,
+                                                              wr_ws.name))
             status = eval("vmm.%s(**var_dict[pos])" % func)
             wb_update(wr_ws, status, row_num)
             time.sleep(.025)
@@ -229,6 +239,8 @@ def fab_admin_policies(apic, cookies, wb, wr_wb):
             for x in list(var_dict[pos].keys()):
                 if var_dict[pos][x] == '':
                     del var_dict[pos][x]
+            print('Deploying line {} from sheet {}...'.format(row_num + 1,
+                                                              wr_ws.name))
             status = eval("fabadmin.%s(**var_dict[pos])" % func)
             wb_update(wr_ws, status, row_num)
             time.sleep(.025)
@@ -249,6 +261,8 @@ def mpod_policies(apic, cookies, wb, wr_wb):
             for x in list(var_dict[pos].keys()):
                 if var_dict[pos][x] == '':
                     del var_dict[pos][x]
+            print('Deploying line {} from sheet {}...'.format(row_num + 1,
+                                                              wr_ws.name))
             status = eval("mpod.%s(**var_dict[pos])" % func)
             wb_update(wr_ws, status, row_num)
             time.sleep(.025)
