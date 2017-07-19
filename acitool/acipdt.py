@@ -1060,7 +1060,7 @@ class FabTnPol(object):
                          'unk_unicast': '',
                          'vrf': '',
                          'status': ''}
-        optional_args = {}
+        optional_args = {'limitlearn': 'yes'}
 
         templateVars = process_kwargs(required_args, optional_args, **kwargs)
 
