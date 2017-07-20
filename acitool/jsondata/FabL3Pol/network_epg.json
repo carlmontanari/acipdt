@@ -8,14 +8,6 @@
         },
         "children": [
             {
-                "l3extConfigOutDef": {
-                    "attributes": {
-                        "rn": "configOutDef",
-                        "status": "created,modified"
-                    }
-                }
-            },
-            {
                 "l3extSubnet": {
                     "attributes": {
                         "aggregate": "",

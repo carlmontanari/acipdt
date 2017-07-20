@@ -11,6 +11,23 @@ import ipaddress
 import getpass
 import os
 
+# Log levels 0 = None, 1 = Method only, 2 = Line
+log_level = 2
+
+
+def stdout_log(sheet, line):
+    if log_level == 0:
+        return
+    elif ((log_level == (1) or log_level == (2)) and
+            (sheet) and (line is None)):
+        print('*' * 80)
+        print('Starting work on {} section'.format(sheet))
+        print('*' * 80)
+    elif log_level == (2) and (sheet) and (line is not None):
+        print('Deploying line {} from section {}...'.format(line, sheet))
+    else:
+        return
+
 
 def read_in(usr_path):
     try:
@@ -54,7 +71,8 @@ def findVars(ws, rows, func, count):
                         var_list.append((ws.cell(i - 1, x)).value)
                     else:
                         x += 1
-            except:
+            except Exception as e:
+                e = e
                 pass
             break
     while count > 0:
@@ -120,6 +138,7 @@ def pod_policies(apic, cookies, wb, wr_wb):
     rows = ws.nrows
     func_list = findKeys(ws, rows)
     podpol = acipdt.FabPodPol(apic, cookies)
+    stdout_log(wr_ws.name, None)
     for func in func_list:
         count = countKeys(ws, rows, func)
         var_dict = findVars(ws, rows, func, count)
@@ -129,6 +148,7 @@ def pod_policies(apic, cookies, wb, wr_wb):
             for x in list(var_dict[pos].keys()):
                 if var_dict[pos][x] == '':
                     del var_dict[pos][x]
+            stdout_log(wr_ws.name, row_num)
             status = eval("podpol.%s(**var_dict[pos])" % func)
             wb_update(wr_ws, status, row_num)
             time.sleep(.025)
@@ -140,6 +160,7 @@ def access_policies(apic, cookies, wb, wr_wb):
     rows = ws.nrows
     func_list = findKeys(ws, rows)
     accpol = acipdt.FabAccPol(apic, cookies)
+    stdout_log(wr_ws.name, None)
     for func in func_list:
         count = countKeys(ws, rows, func)
         var_dict = findVars(ws, rows, func, count)
@@ -149,6 +170,7 @@ def access_policies(apic, cookies, wb, wr_wb):
             for x in list(var_dict[pos].keys()):
                 if var_dict[pos][x] == '':
                     del var_dict[pos][x]
+            stdout_log(wr_ws.name, row_num)
             status = eval("accpol.%s(**var_dict[pos])" % func)
             wb_update(wr_ws, status, row_num)
             time.sleep(.025)
@@ -160,6 +182,7 @@ def tn_policies(apic, cookies, wb, wr_wb):
     rows = ws.nrows
     func_list = findKeys(ws, rows)
     tnpol = acipdt.FabTnPol(apic, cookies)
+    stdout_log(wr_ws.name, None)
     for func in func_list:
         count = countKeys(ws, rows, func)
         var_dict = findVars(ws, rows, func, count)
@@ -169,6 +192,7 @@ def tn_policies(apic, cookies, wb, wr_wb):
             for x in list(var_dict[pos].keys()):
                 if var_dict[pos][x] == '':
                     del var_dict[pos][x]
+            stdout_log(wr_ws.name, row_num)
             status = eval("tnpol.%s(**var_dict[pos])" % func)
             wb_update(wr_ws, status, row_num)
             time.sleep(.025)
@@ -180,6 +204,7 @@ def l3_policies(apic, cookies, wb, wr_wb):
     rows = ws.nrows
     func_list = findKeys(ws, rows)
     l3pol = acipdt.FabL3Pol(apic, cookies)
+    stdout_log(wr_ws.name, None)
     for func in func_list:
         count = countKeys(ws, rows, func)
         var_dict = findVars(ws, rows, func, count)
@@ -189,6 +214,7 @@ def l3_policies(apic, cookies, wb, wr_wb):
             for x in list(var_dict[pos].keys()):
                 if var_dict[pos][x] == '':
                     del var_dict[pos][x]
+            stdout_log(wr_ws.name, row_num)
             status = eval("l3pol.%s(**var_dict[pos])" % func)
             wb_update(wr_ws, status, row_num)
             time.sleep(.025)
@@ -200,6 +226,7 @@ def vmm_policies(apic, cookies, wb, wr_wb):
     rows = ws.nrows
     func_list = findKeys(ws, rows)
     vmm = acipdt.FabVMM(apic, cookies)
+    stdout_log(wr_ws.name, None)
     for func in func_list:
         count = countKeys(ws, rows, func)
         var_dict = findVars(ws, rows, func, count)
@@ -209,6 +236,7 @@ def vmm_policies(apic, cookies, wb, wr_wb):
             for x in list(var_dict[pos].keys()):
                 if var_dict[pos][x] == '':
                     del var_dict[pos][x]
+            stdout_log(wr_ws.name, row_num)
             status = eval("vmm.%s(**var_dict[pos])" % func)
             wb_update(wr_ws, status, row_num)
             time.sleep(.025)
@@ -220,6 +248,7 @@ def fab_admin_policies(apic, cookies, wb, wr_wb):
     rows = ws.nrows
     func_list = findKeys(ws, rows)
     fabadmin = acipdt.FabAdminMgmt(apic, cookies)
+    stdout_log(wr_ws.name, None)
     for func in func_list:
         count = countKeys(ws, rows, func)
         var_dict = findVars(ws, rows, func, count)
@@ -229,6 +258,7 @@ def fab_admin_policies(apic, cookies, wb, wr_wb):
             for x in list(var_dict[pos].keys()):
                 if var_dict[pos][x] == '':
                     del var_dict[pos][x]
+            stdout_log(wr_ws.name, row_num)
             status = eval("fabadmin.%s(**var_dict[pos])" % func)
             wb_update(wr_ws, status, row_num)
             time.sleep(.025)
@@ -240,6 +270,7 @@ def mpod_policies(apic, cookies, wb, wr_wb):
     rows = ws.nrows
     func_list = findKeys(ws, rows)
     mpod = acipdt.Mpod(apic, cookies)
+    stdout_log(wr_ws.name, None)
     for func in func_list:
         count = countKeys(ws, rows, func)
         var_dict = findVars(ws, rows, func, count)
@@ -249,6 +280,7 @@ def mpod_policies(apic, cookies, wb, wr_wb):
             for x in list(var_dict[pos].keys()):
                 if var_dict[pos][x] == '':
                     del var_dict[pos][x]
+            stdout_log(wr_ws.name, row_num)
             status = eval("mpod.%s(**var_dict[pos])" % func)
             wb_update(wr_ws, status, row_num)
             time.sleep(.025)
@@ -261,61 +293,74 @@ def take_snapshot(apic, cookies, snapshot_name):
     payload_len = len(query_payload[1]['imdata'])
     snap_count = 0
     for x in range(0, payload_len):
-        if (query_payload[1]['imdata'][x]['configSnapshot']['attributes']
-                ['fileName'])[4:17] == snapshot_name:
-                snap_count += 1
+        try:
+            if (query_payload[1]['imdata'][x]['configSnapshot']['attributes']
+                    ['fileName'])[4:17] == snapshot_name:
+                    snap_count += 1
+        except Exception as e:
+            e = e
+            print("It seems the APIC does not support snapshots, moving on.")
+            return(None)
 
     if snap_count > 0:
-        print("A snapshot with that name ({}) already exists. Please change th"
-              "e name of the snapshot in the main.py file, or delete the exist"
-              "ing snapshot. Exiting.".format(snapshot_name))
-        sys.exit()
-    elif snap_count == 0:
-        snapshot = 'true'
-        status = 'created,modified'
-        snapshot_args = {}
-        snapshot_args['name'] = snapshot_name
-        snapshot_args['snapshot'] = snapshot
-        snapshot_args['status'] = status
-        cfgmgmt = acipdt.FabCfgMgmt(apic, cookies)
-        status = cfgmgmt.backup(**snapshot_args)
-        if status == 200:
-            print("Snapshot taken successfully, continuing.")
-            time.sleep(5)
-        else:
-            print("Snapshot failed for some reason, do you want to continue?")
-            while True:
-                user_input = input("Continue 'y' or 'n' [n]: ")
-                selection = user_input or 'n'
-                if selection.lower() == 'y':
-                    continue
-                elif selection.lower() == 'n':
-                    del_snap_pol(apic, cookies, snapshot_name)
-                    sys.exit()
+        print("A snapshot including 'acipdt_backup' already exists. Would you "
+              "like to delete this snapshot or exit?")
+        user_input = input("Delete 'd' or Exit 'q' [q]: ")
+        selection = user_input or 'q'
+        if selection.lower() == 'd':
+            del_snap_pol(apic, cookies, snapshot_name)
+        elif selection.lower() == 'q':
+            sys.exit()
+
+    snapshot = 'true'
+    status = 'created,modified'
+    snapshot_args = {}
+    snapshot_args['name'] = snapshot_name
+    snapshot_args['snapshot'] = snapshot
+    snapshot_args['status'] = status
+    cfgmgmt = acipdt.FabCfgMgmt(apic, cookies)
+    status = cfgmgmt.backup(**snapshot_args)
+    if status == 200:
+        print("Snapshot taken successfully, continuing.")
+        time.sleep(1)
+        snap = True
+        return(snap)
+    else:
+        print("Snapshot failed for some reason, do you want to continue?")
+        while True:
+            user_input = input("Continue 'y' or 'n' [n]: ")
+            selection = user_input or 'n'
+            if selection.lower() == 'y':
+                continue
+            elif selection.lower() == 'n':
+                del_snap_pol(apic, cookies, snapshot_name)
+                sys.exit()
 
 
 def revert_snapshot(apic, cookies, snapshot_name):
     print('Deployment completed, please verify status in workbook.')
-    user_input = input("Rollback to previous snapshot 'y' or 'n' [n]: ")
-    selection = user_input or 'n'
-    if selection.lower() == 'n':
-        pass
-    elif selection.lower() == 'y':
-        query = acipdt.Query(apic, cookies)
-        query_string = 'configSnapshot'
-        query_payload = query.query_class(query_string)
-        payload_len = len(query_payload[1]['imdata'])
-        for x in range(0, payload_len):
-            if (query_payload[1]['imdata'][x]['configSnapshot']['attributes']
-                    ['fileName'])[4:17] == snapshot_name:
-                snapshot_name = (query_payload[1]['imdata'][x]
-                                 ['configSnapshot']['attributes']
-                                 ['fileName'])
-                break
-        cfgmgmt = acipdt.FabCfgMgmt(apic, cookies)
-        snapshot_args = {}
-        snapshot_args['name'] = snapshot_name
-        cfgmgmt.snapback(**snapshot_args)
+    while True:
+        user_input = input("Rollback to previous snapshot 'y' or 'n' [n]: ")
+        selection = user_input
+        if selection.lower() == 'n':
+            return
+        elif selection.lower() == 'y':
+            query = acipdt.Query(apic, cookies)
+            query_string = 'configSnapshot'
+            query_payload = query.query_class(query_string)
+            payload_len = len(query_payload[1]['imdata'])
+            for x in range(0, payload_len):
+                if (query_payload[1]['imdata'][x]['configSnapshot']
+                        ['attributes']['fileName'])[4:17] == snapshot_name:
+                    snapshot_name = (query_payload[1]['imdata'][x]
+                                     ['configSnapshot']['attributes']
+                                     ['fileName'])
+                    break
+            cfgmgmt = acipdt.FabCfgMgmt(apic, cookies)
+            snapshot_args = {}
+            snapshot_args['name'] = snapshot_name
+            cfgmgmt.snapback(**snapshot_args)
+            return
 
 
 def del_snap_pol(apic, cookies, snapshot_name):
@@ -368,7 +413,7 @@ def main():
     wb = read_in(usr_path)
     # Copy workbook to a RW version
     wr_wb = copy(wb)
-    take_snapshot(apic, cookies, snapshot_name)
+    snap = take_snapshot(apic, cookies, snapshot_name)
     pod_policies(apic, cookies, wb, wr_wb)
     access_policies(apic, cookies, wb, wr_wb)
     tn_policies(apic, cookies, wb, wr_wb)
@@ -378,8 +423,9 @@ def main():
     mpod_policies(apic, cookies, wb, wr_wb)
     # Save workbook to user path
     wr_wb.save('{}/ACI Deploy.xls'.format(usr_path))
-    revert_snapshot(apic, cookies, snapshot_name)
-    del_snap_pol(apic, cookies, snapshot_name)
+    if snap is not None:
+        revert_snapshot(apic, cookies, snapshot_name)
+        del_snap_pol(apic, cookies, snapshot_name)
 
 
 if __name__ == '__main__':

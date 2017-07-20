@@ -13,5 +13,6 @@ setup(name='ACIPDT',
                         'xlrd',
                         'xlwt',
                         'xlutils',
-                        'orderedset'],
+                        'orderedset',
+                        'jinja2'],
       package_data={'': ['*.json', '*.xls']})

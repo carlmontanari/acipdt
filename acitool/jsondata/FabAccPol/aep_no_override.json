@@ -7,22 +7,6 @@
                     },
                     "children": [
                         {
-                            "infraContNS": {
-                                "attributes": {
-                                    "rn": "nscont",
-                                    "status": "{{status}}"
-                                }
-                            }
-                        },
-                        {
-                            "infraContDomP": {
-                                "attributes": {
-                                    "rn": "dompcont",
-                                    "status": "{{status}}"
-                                }
-                            }
-                        },
-                        {
                             "infraProvAcc": {
                                 "attributes": {
                                     "name": "default",
