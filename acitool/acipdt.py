@@ -1301,6 +1301,31 @@ class FabTnPol(object):
     # Method must be called with the following kwargs.
     # tn_name: The name of the Tenant
     # ap_name: Name of parent Application Profile
+    # name: Name of the EPG
+    # prfgrp: include | exclude
+    def epg_prfgrp(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'ap_name': '',
+                         'name': '',
+                         'prfgrp': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        template_file = "epg_prfgrp.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/ap-{}/epg-{}'
+               .format(templateVars['tn_name'], templateVars['ap_name'],
+                       templateVars['name']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # tn_name: The name of the Tenant
+    # ap_name: Name of parent Application Profile
     # epg_name: Name of the EPG
     # phys_dom: Name of the Physical Domain
     # deploy: lazy | immediate

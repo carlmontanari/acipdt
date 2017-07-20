@@ -1,0 +1,11 @@
+{
+  "fvAEPg": {
+    "attributes": {
+      "descr": "",
+      "dn": "uni/tn-{{tn_name}}/ap-{{ap_name}}/epg-{{name}}",
+      "matchT": "AtleastOne",
+      "name": "{{name}}",
+      "prefGrMemb": "{{prfgrp}}"
+    }
+  }
+}
