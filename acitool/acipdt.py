@@ -1042,6 +1042,28 @@ class FabTnPol(object):
 
     # Method must be called with the following kwargs.
     # tn_name: The name of the Tenant
+    # name: Name of the VRF
+    # prefgrp: enforced | unenforced
+    def prefgrp(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'name': '',
+                         'prefgrp': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        template_file = "prefgrp.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/ctx-{}/any'
+               .format(templateVars['tn_name'], templateVars['name']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # tn_name: The name of the Tenant
     # name: Name of the BD
     # arp: yes | no
     # mdest: bd-flood | drop | encap-flood
