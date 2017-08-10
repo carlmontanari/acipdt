@@ -11,7 +11,7 @@ import ipaddress
 import getpass
 import os
 
-# Log levels 0 = None, 1 = Method only, 2 = Line
+# Log levels 0 = None, 1 = Class only, 2 = Line
 log_level = 2
 
 
@@ -331,7 +331,8 @@ def take_snapshot(apic, cookies, snapshot_name):
             user_input = input("Continue 'y' or 'n' [n]: ")
             selection = user_input or 'n'
             if selection.lower() == 'y':
-                continue
+                snap = None
+                return(snap)
             elif selection.lower() == 'n':
                 del_snap_pol(apic, cookies, snapshot_name)
                 sys.exit()
