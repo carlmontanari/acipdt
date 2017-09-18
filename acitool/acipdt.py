@@ -59,6 +59,8 @@ def post(apic, payload, cookies, uri, section):
             print("Method {} failed. Exception: {}".format(section[:-5], e))
             status = 666
             return(status)
+        if status != 200:
+            print(r.text)
     return status
 
 
@@ -1185,18 +1187,30 @@ class FabTnPol(object):
 
         templateVars = process_kwargs(required_args, optional_args, **kwargs)
 
-        if not ((templateVars['dst_start'] == 'unspecified') or
-                int(templateVars['dst_start'])):
-            raise InvalidArg("Filter port must be 'unspecified' or an integer")
-        if not ((templateVars['dst_end'] == 'unspecified') or
-                int(templateVars['dst_end'])):
-            raise InvalidArg("Filter port must be 'unspecified' or an integer")
-        if not ((templateVars['src_start'] == 'unspecified') or
-                int(templateVars['src_start'])):
-            raise InvalidArg("Filter port must be 'unspecified' or an integer")
-        if not ((templateVars['src_end'] == 'unspecified') or
-                int(templateVars['src_end'])):
-            raise InvalidArg("Filter port must be 'unspecified' or an integer")
+        if not (templateVars['dst_start'] == 'unspecified'):
+            try:
+                templateVars['dst_start'] = int(templateVars['dst_start'])
+            except Exception as e:
+                print(e)
+                raise InvalidArg("Filter port must be 'unspecified' or an integer")
+        if not (templateVars['dst_end'] == 'unspecified'):
+            try:
+                templateVars['dst_end'] = int(templateVars['dst_end'])
+            except Exception as e:
+                print(e)
+                raise InvalidArg("Filter port must be 'unspecified' or an integer")
+        if not (templateVars['src_start'] == 'unspecified'):
+            try:
+                templateVars['src_start'] = int(templateVars['src_start'])
+            except Exception as e:
+                print(e)
+                raise InvalidArg("Filter port must be 'unspecified' or an integer")
+        if not (templateVars['src_end'] == 'unspecified'):
+            try:
+                templateVars['src_end'] = int(templateVars['src_end'])
+            except Exception as e:
+                print(e)
+                raise InvalidArg("Filter port must be 'unspecified' or an integer")
         if templateVars['status'] not in valid_status:
             raise InvalidArg('Status invalid')
 
