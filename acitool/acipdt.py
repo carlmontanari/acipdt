@@ -2653,7 +2653,7 @@ class FabAdminMgmt(object):
         required_args = {'address': '',
                          'gateway': '',
                          'pod': '',
-						 'status': '',
+			 'status': '',
 			 'id': ''}
         optional_args = {}
 
