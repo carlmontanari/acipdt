@@ -1,0 +1,35 @@
+{
+	"mgmtMgmtP": {
+					"attributes": {
+						"descr": "",
+						"name": "default",
+						"nameAlias": "",
+						"ownerKey": "",
+						"ownerTag": ""
+					},
+					"children": [{
+						"mgmtOoB": {
+							"attributes": {
+								"descr": "",
+								"name": "default",
+								"nameAlias": "",
+								"prio": "unspecified"
+							},
+							"children": [{
+								"mgmtRsOoBStNode": {
+									"attributes": {
+										"addr": "{{address}}",
+										"gw": "{{gateway}}",
+										"tDn": "topology/pod-{{pod}}/node-{{id}}",
+										"v6Addr": "::",
+										"v6Gw": "::"
+									}
+								}
+							}
+							
+					}]
+				
+				}
+		}
+	}
+		
