@@ -2648,7 +2648,7 @@ class FabAdminMgmt(object):
     # address: node ip
     # gateway: gateway IP
     # pod: Pod Node Lives in
-	# id: Node id
+    # id: Node id
     def oob_mgmt(self, **kwargs):
         required_args = {'address': '',
                          'gateway': '',
