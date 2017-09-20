@@ -1,0 +1,12 @@
+{  
+  "mgmtRsOoBStNode":{  
+    "attributes":{  
+      "addr":"{{address}}",
+      "dn":"uni/tn-mgmt/mgmtp-default/oob-default/rsooBStNode-[topology/pod-{{pod}}/node-{{id}}]",
+      "gw":"{{gateway}}",
+      "tDn":"topology/pod-{{pod}}/node-{{id}}",
+      "v6Addr":"::",
+      "v6Gw":"::"
+    }
+  }
+}

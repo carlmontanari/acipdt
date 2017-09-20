@@ -2643,6 +2643,40 @@ class FabAdminMgmt(object):
         uri = 'mo/uni/userext/user-{}'.format(templateVars['user'])
         status = post(self.apic, payload, self.cookies, uri, template_file)
         return status
+		
+    # Method must be called with the following kwargs.
+    # address: node ip
+    # gateway: gateway IP
+    # pod: Pod Node Lives in
+	# id: Node id
+    def oob_mgmt(self, **kwargs):
+        required_args = {'address': '',
+                         'gateway': '',
+                         'pod': '',
+			 'status': '',
+			 'id': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+        
+        if not int(templateVars['id']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['id'] = int(templateVars['id'])
+        if not int(templateVars['pod']):
+            raise InvalidArg('Pod must be an integer')
+        else:
+            templateVars['pod'] = int(templateVars['pod'])
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "oob_mgmt.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+        uri = 'mo/uni/tn-mgmt'
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
 
 
 # Class must be instantiated with APIC IP address and cookies
