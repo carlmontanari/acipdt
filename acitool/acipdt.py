@@ -2654,7 +2654,7 @@ class FabAdminMgmt(object):
                          'gateway': '',
                          'pod': '',
 						 'status': '',
-			             'id': ''}
+			 'id': ''}
         optional_args = {}
 
         templateVars = process_kwargs(required_args, optional_args, **kwargs)
@@ -2664,7 +2664,7 @@ class FabAdminMgmt(object):
         else:
             templateVars['id'] = int(templateVars['id'])
         if not int(templateVars['pod']):
-            raise InvalidArg('pod must be an integer')
+            raise InvalidArg('Pod must be an integer')
         else:
             templateVars['pod'] = int(templateVars['pod'])
         if templateVars['status'] not in valid_status:
