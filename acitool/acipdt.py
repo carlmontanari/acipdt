@@ -2641,7 +2641,8 @@ class FabAdminMgmt(object):
         uri = 'mo/uni/userext/user-{}'.format(templateVars['user'])
         status = post(self.apic, payload, self.cookies, uri, template_file)
         return status
-		
+
+
     # Method must be called with the following kwargs.
     # address: node ip
     # gateway: gateway IP
@@ -2651,12 +2652,12 @@ class FabAdminMgmt(object):
         required_args = {'address': '',
                          'gateway': '',
                          'pod': '',
-			 'status': '',
-			 'id': ''}
+                         'status': '',
+                         'id': ''}
         optional_args = {}
 
         templateVars = process_kwargs(required_args, optional_args, **kwargs)
-        
+
         if not int(templateVars['id']):
             raise InvalidArg('ID must be an integer')
         else:
