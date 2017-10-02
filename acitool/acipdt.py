@@ -1043,6 +1043,60 @@ class FabTnPol(object):
     # Method must be called with the following kwargs.
     # tn_name: The name of the Tenant
     # name: Name of the VRF
+    # contract: Name of the Contract
+    # status: created | created,modified | deleted
+    def vz_any_provide(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'name': '',
+                         'contract': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "vz_any_provide.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/ctx-{}'
+               .format(templateVars['tn_name'], templateVars['name']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # tn_name: The name of the Tenant
+    # name: Name of the VRF
+    # contract: Name of the Contract
+    # status: created | created,modified | deleted
+    def vz_any_consume(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'name': '',
+                         'contract': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "vz_any_consume.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/ctx-{}'
+               .format(templateVars['tn_name'], templateVars['name']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # tn_name: The name of the Tenant
+    # name: Name of the VRF
     # prefgrp: enforced | unenforced
     def prefgrp(self, **kwargs):
         required_args = {'tn_name': '',
@@ -1375,7 +1429,7 @@ class FabTnPol(object):
     # epg_name: Name of the EPG
     # vmm_dom: Name of the VMM Domain
     # deploy: lazy | immediate
-    # resolve: lazy | immediate | on-demand
+    # resolve: lazy | immediate | pre-provision
     # status: created | created,modified | deleted
     def epg_vmm_dom(self, **kwargs):
         required_args = {'tn_name': '',
@@ -1650,6 +1704,41 @@ class FabTnPol(object):
             raise InvalidArg('Status invalid')
 
         template_file = "dhcp_relay.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/relayp-{}'
+               .format(templateVars['tn_name'], templateVars['relay_name']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # tn_name: The name of the Tenant
+    # relay_name: Name of the DHCP Label/Provider
+    # dhcp_ip: IP of the DHCP server
+    # dhcp_tn_name: Name of the Tenant containing the DHCP server
+    # dhcp_ap_name: Name of the AP containing the DHCP server
+    # dhcp_epg_name: Name of the EPG containing the DHCP server
+    # status: created | created,modified | deleted
+    def dhcp_relay_tn(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'relay_name': '',
+                         'dhcp_ip': '',
+                         'dhcp_tn_name': '',
+                         'dhcp_ap_name': '',
+                         'dhcp_epg_name': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if not ipaddress.ip_address(templateVars['dhcp_ip']):
+            raise InvalidArg('Address must be a valid IPv4 address')
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "dhcp_relay_tn.json"
         template = self.templateEnv.get_template(template_file)
 
         payload = template.render(templateVars)
@@ -2641,7 +2730,6 @@ class FabAdminMgmt(object):
         uri = 'mo/uni/userext/user-{}'.format(templateVars['user'])
         status = post(self.apic, payload, self.cookies, uri, template_file)
         return status
-
 
     # Method must be called with the following kwargs.
     # address: node ip
