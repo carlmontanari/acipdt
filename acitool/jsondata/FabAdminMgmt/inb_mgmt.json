@@ -1,0 +1,11 @@
+{
+  "mgmtRsInBStNode": {
+    "attributes": {
+      "addr": "{{address}}",
+      "dn": "uni/tn-mgmt/mgmtp-default/inb-{{inb_epg_name}}/rsinBStNode-[topology/pod-{{pod}}/node-{{id}}]",
+      "gw": "{{gateway}}",
+      "tDn": "topology/pod-{{pod}}/node-{{id}}",
+      "status": "{{status}}"
+    }
+  }
+}
