@@ -59,8 +59,6 @@ def post(apic, payload, cookies, uri, section):
             print("Method {} failed. Exception: {}".format(section[:-5], e))
             status = 666
             return(status)
-        if status != 200:
-            print(r.text)
     return status
 
 
