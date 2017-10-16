@@ -1043,7 +1043,7 @@ class FabTnPol(object):
     # Method must be called with the following kwargs.
     # tn_name: The name of the Tenant
     # name: Name of the VRF
-    # prefgrp: enforced | unenforced
+    # prefgrp: disabled | enabled
     def prefgrp(self, **kwargs):
         required_args = {'tn_name': '',
                          'name': '',
