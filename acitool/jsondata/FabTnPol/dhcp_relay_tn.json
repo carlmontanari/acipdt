@@ -1,0 +1,22 @@
+{
+  "dhcpRelayP": {
+    "attributes": {
+      "descr": "",
+      "dn": "uni/tn-{{tn_name}}/relayp-{{relay_name}}",
+      "mode": "visible",
+      "name": "{{relay_name}}",
+      "owner": "infra",
+      "status": "{{status}}"
+    },
+    "children": [
+      {
+        "dhcpRsProv": {
+          "attributes": {
+            "addr": "{{dhcp_ip}}",
+            "tDn": "uni/tn-{{dhcp_tn_name}}/ap-{{dhcp_ap_name}}/epg-{{dhcp_epg_name}}"
+          }
+        }
+      }
+    ]
+  }
+}

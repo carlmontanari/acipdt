@@ -1,0 +1,19 @@
+{
+  "mgmtInB": {
+    "attributes": {
+      "descr": "",
+      "dn": "uni/tn-mgmt/mgmtp-default/inb-{{name}}"
+    },
+    "children": [
+      {
+        "fvRsCons": {
+          "attributes": {
+            "prio": "unspecified",
+            "tnVzBrCPName": "{{contract}}",
+            "status": "{{status}}"
+          }
+        }
+      }
+    ]
+  }
+}

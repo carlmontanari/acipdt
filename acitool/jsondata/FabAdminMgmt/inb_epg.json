@@ -1,0 +1,22 @@
+{
+  "mgmtInB": {
+    "attributes": {
+      "descr": "",
+      "dn": "uni/tn-mgmt/mgmtp-default/inb-{{name}}",
+      "encap": "vlan-{{vlan}}",
+      "matchT": "AtleastOne",
+      "name": "{{name}}",
+      "prio": "unspecified",
+      "status": "{{status}}"
+    },
+    "children": [
+      {
+        "mgmtRsMgmtBD": {
+          "attributes": {
+            "tnFvBDName": "inb"
+          }
+        }
+      }
+    ]
+  }
+}

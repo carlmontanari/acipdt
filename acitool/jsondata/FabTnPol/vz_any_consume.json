@@ -1,0 +1,21 @@
+{
+  "vzAny": {
+    "attributes": {
+      "descr": "",
+      "dn": "uni/tn-{{tn_name}}/ctx-{{name}}/any",
+      "matchT": "AtleastOne",
+      "name": ""
+    },
+    "children": [
+      {
+        "vzRsAnyToCons": {
+          "attributes": {
+            "prio": "unspecified",
+            "tnVzBrCPName": "{{contract}}",
+            "status": "{{status}}"            
+          }
+        }
+      }
+    ]
+  }
+}

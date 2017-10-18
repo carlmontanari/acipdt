@@ -1043,6 +1043,60 @@ class FabTnPol(object):
     # Method must be called with the following kwargs.
     # tn_name: The name of the Tenant
     # name: Name of the VRF
+    # contract: Name of the Contract
+    # status: created | created,modified | deleted
+    def vz_any_provide(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'name': '',
+                         'contract': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "vz_any_provide.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/ctx-{}'
+               .format(templateVars['tn_name'], templateVars['name']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # tn_name: The name of the Tenant
+    # name: Name of the VRF
+    # contract: Name of the Contract
+    # status: created | created,modified | deleted
+    def vz_any_consume(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'name': '',
+                         'contract': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "vz_any_consume.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/ctx-{}'
+               .format(templateVars['tn_name'], templateVars['name']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # tn_name: The name of the Tenant
+    # name: Name of the VRF
     # prefgrp: disabled | enabled
     def prefgrp(self, **kwargs):
         required_args = {'tn_name': '',
@@ -1375,7 +1429,7 @@ class FabTnPol(object):
     # epg_name: Name of the EPG
     # vmm_dom: Name of the VMM Domain
     # deploy: lazy | immediate
-    # resolve: lazy | immediate | on-demand
+    # resolve: lazy | immediate | pre-provision
     # status: created | created,modified | deleted
     def epg_vmm_dom(self, **kwargs):
         required_args = {'tn_name': '',
@@ -1650,6 +1704,41 @@ class FabTnPol(object):
             raise InvalidArg('Status invalid')
 
         template_file = "dhcp_relay.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/relayp-{}'
+               .format(templateVars['tn_name'], templateVars['relay_name']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # tn_name: The name of the Tenant
+    # relay_name: Name of the DHCP Label/Provider
+    # dhcp_ip: IP of the DHCP server
+    # dhcp_tn_name: Name of the Tenant containing the DHCP server
+    # dhcp_ap_name: Name of the AP containing the DHCP server
+    # dhcp_epg_name: Name of the EPG containing the DHCP server
+    # status: created | created,modified | deleted
+    def dhcp_relay_tn(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'relay_name': '',
+                         'dhcp_ip': '',
+                         'dhcp_tn_name': '',
+                         'dhcp_ap_name': '',
+                         'dhcp_epg_name': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if not ipaddress.ip_address(templateVars['dhcp_ip']):
+            raise InvalidArg('Address must be a valid IPv4 address')
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "dhcp_relay_tn.json"
         template = self.templateEnv.get_template(template_file)
 
         payload = template.render(templateVars)
@@ -2642,7 +2731,6 @@ class FabAdminMgmt(object):
         status = post(self.apic, payload, self.cookies, uri, template_file)
         return status
 
-
     # Method must be called with the following kwargs.
     # address: node ip
     # gateway: gateway IP
@@ -2670,6 +2758,113 @@ class FabAdminMgmt(object):
             raise InvalidArg('Status invalid')
 
         template_file = "oob_mgmt.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+        uri = 'mo/uni/tn-mgmt'
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # name: name of in band EPG
+    # vlan: vlan to be used for inb
+    # status: created | created,modified | deleted
+    def inb_epg(self, **kwargs):
+        required_args = {'name': '',
+                         'vlan': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if not int(templateVars['vlan']):
+            raise InvalidArg('VLAN IDs must be an integer')
+        else:
+            templateVars['vlan'] = int(templateVars['vlan'])
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "inb_epg.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+        uri = 'mo/uni/tn-mgmt'
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # name: name of in band EPG
+    # contract: contract to be applied
+    # status: created | created,modified | deleted
+    def inb_epg_consume(self, **kwargs):
+        required_args = {'name': '',
+                         'contract': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "inb_epg_consume.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+        uri = 'mo/uni/tn-mgmt'
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # name: name of in band EPG
+    # contract: contract to be applied
+    # status: created | created,modified | deleted
+    def inb_epg_provide(self, **kwargs):
+        required_args = {'name': '',
+                         'contract': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "inb_epg_provide.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+        uri = 'mo/uni/tn-mgmt'
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # address: node ip
+    # gateway: gateway IP
+    # pod: Pod Node Lives in
+    # id: Node id
+    def inb_mgmt(self, **kwargs):
+        required_args = {'address': '',
+                         'gateway': '',
+                         'inb_epg_name': '',
+                         'status': '',
+                         'id': ''}
+        optional_args = {'pod': '1'}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if not int(templateVars['id']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['id'] = int(templateVars['id'])
+        if not int(templateVars['pod']):
+            raise InvalidArg('Pod must be an integer')
+        else:
+            templateVars['pod'] = int(templateVars['pod'])
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "inb_mgmt.json"
         template = self.templateEnv.get_template(template_file)
 
         payload = template.render(templateVars)
