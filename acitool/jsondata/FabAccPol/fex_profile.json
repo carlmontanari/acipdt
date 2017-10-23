@@ -1,0 +1,19 @@
+{
+  "infraFexP": {
+    "attributes": {
+      "descr": "",
+      "dn": "uni/infra/fexprof-{{name}}",
+      "name": "{{name}}",
+      "status": "{{status}}"
+    },
+    "children": [
+      {
+        "infraFexBndlGrp": {
+          "attributes": {
+            "name": "{{fex_pol_grp}}"
+          }
+        }
+      }
+    ]
+  }
+}
