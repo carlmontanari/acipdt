@@ -10,7 +10,7 @@
         "infraRsAccBaseGrp": {
           "attributes": {
             "fexId": "{{fex_id}}",
-            "tDn": "uni/infra/funcprof/{{port_type}}-{{polgrp}}"
+            "tDn": "uni/infra/funcprof/{{port_type}}-{{pol_group}}"
           }
         }
       },

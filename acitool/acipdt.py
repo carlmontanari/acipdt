@@ -1060,7 +1060,7 @@ class FabAccPol(object):
         payload = template.render(templateVars)
 
         uri = ('mo/uni/infra/fexprof-{}/hports-{}-typ-range'
-               .format(templateVars['name']), templateVars['port_name'])
+               .format(templateVars['name'], templateVars['port_name']))
         status = post(self.apic, payload, self.cookies, uri, template_file)
         return status
 
@@ -1074,6 +1074,7 @@ class FabAccPol(object):
     # port_end: Ending port as an integer
     # fex_id: Integer ID of the FEX
     # fex_pol_grp: Name of FEX Policy Group
+    # fex_prof: Name of the FEX Profile
     def fex_leaf_profile(self, **kwargs):
         required_args = {'name': '',
                          'status': '',
@@ -1081,6 +1082,7 @@ class FabAccPol(object):
                          'port_start': '',
                          'port_end': '',
                          'fex_id': '',
+                         'fex_prof': '',
                          'fex_pol_grp': ''}
         optional_args = {'mod_start': '1',
                          'mod_end': '1'}
