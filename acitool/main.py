@@ -342,7 +342,7 @@ def revert_snapshot(apic, cookies, snapshot_name):
     print('Deployment completed, please verify status in workbook.')
     while True:
         user_input = input("Rollback to previous snapshot 'y' or 'n' [n]: ")
-        selection = user_input
+        selection = user_input or 'n'
         if selection.lower() == 'n':
             return
         elif selection.lower() == 'y':

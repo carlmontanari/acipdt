@@ -1,0 +1,21 @@
+{
+  "fvAEPg": {
+    "attributes": {
+      "dn": "uni/tn-{{tn_name}}/ap-{{ap_name}}/epg-{{epg_name}}"
+    },
+    "children": [
+      {
+        "fvRsPathAtt": {
+          "attributes": {
+            "encap": "vlan-{{encap}}",
+            "instrImedcy": "{{deploy}}",
+            "mode": "{{mode}}",
+            "primaryEncap": "unknown",
+            "tDn": "topology/pod-{{pod}}/paths-{{sw1}}/extpaths-{{fex_id}}/pathep-[eth1/{{port}}]",
+            "status": "{{status}}"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -981,6 +981,146 @@ class FabAccPol(object):
         status = post(self.apic, payload, self.cookies, uri, template_file)
         return status
 
+    # Method must be called with the following kwargs.
+    # name: Name of the Interface Selector
+    # fex_pol_grp: Name of the FEX Policy Group
+    # status: created | created,modified | deleted
+    def fex_profile(self, **kwargs):
+        required_args = {'name': '',
+                         'fex_pol_grp': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "fex_profile.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = 'mo/uni/infra/fexprof-{}'.format(templateVars['name'])
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # name: Name of the Interface Selector
+    # status: created | created,modified | deleted
+    # port_name: Name of the port selector in the Interface Profile
+    # port_type: accportgrp | accbundle
+    #   Note: accportgrp = Access Port
+    #   Note: accbundle = vPC or Port Channel
+    # pol_group: Name of the Policy Group to apply
+    # mod_start: Starting mod as an integer (almost always 1)
+    # mod_end: Ending mod as an integer (almost always 1)
+    # port_start: Starting port as an integer
+    # port_end: Ending port as an integer
+    def fex_int_profile(self, **kwargs):
+        required_args = {'name': '',
+                         'status': '',
+                         'port_name': '',
+                         'port_type': '',
+                         'pol_group': '',
+                         'port_start': '',
+                         'port_end': '',
+                         'fex_id': ''}
+        optional_args = {'mod_start': '1',
+                         'mod_end': '1'}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if not int(templateVars['mod_start']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['mod_start'] = int(templateVars['mod_start'])
+        if not int(templateVars['mod_end']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['mod_end'] = int(templateVars['mod_end'])
+        if not int(templateVars['port_start']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['port_start'] = int(templateVars['port_start'])
+        if not int(templateVars['port_end']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['port_end'] = int(templateVars['port_end'])
+        if not int(templateVars['fex_id']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['fex_id'] = int(templateVars['fex_id'])
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "fex_int_profile.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/infra/fexprof-{}/hports-{}-typ-range'
+               .format(templateVars['name'], templateVars['port_name']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # name: Name of the Interface Selector
+    # status: created | created,modified | deleted
+    # port_name: Name of the port selector in the Interface Profile
+    # mod_start: Starting mod as an integer (almost always 1)
+    # mod_end: Ending mod as an integer (almost always 1)
+    # port_start: Starting port as an integer
+    # port_end: Ending port as an integer
+    # fex_id: Integer ID of the FEX
+    # fex_pol_grp: Name of FEX Policy Group
+    # fex_prof: Name of the FEX Profile
+    def fex_leaf_profile(self, **kwargs):
+        required_args = {'name': '',
+                         'status': '',
+                         'port_name': '',
+                         'port_start': '',
+                         'port_end': '',
+                         'fex_id': '',
+                         'fex_prof': '',
+                         'fex_pol_grp': ''}
+        optional_args = {'mod_start': '1',
+                         'mod_end': '1'}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if not int(templateVars['mod_start']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['mod_start'] = int(templateVars['mod_start'])
+        if not int(templateVars['mod_end']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['mod_end'] = int(templateVars['mod_end'])
+        if not int(templateVars['port_start']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['port_start'] = int(templateVars['port_start'])
+        if not int(templateVars['port_end']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['port_end'] = int(templateVars['port_end'])
+        if not int(templateVars['fex_id']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['fex_id'] = int(templateVars['fex_id'])
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "fex_leaf_profile.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = 'mo/uni/infra/accportprof-{}'.format(templateVars['name'])
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
 
 # Class must be instantiated with APIC IP address and cookies
 class FabTnPol(object):
@@ -1774,6 +1914,67 @@ class FabTnPol(object):
 
         uri = ('mo/uni/tn-{}/BD-{}'
                .format(templateVars['tn_name'], templateVars['bd_name']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # tn_name: The name of the Tenant
+    # ap_name: Name of parent Application Profile
+    # epg_name: Name of the EPG
+    # pod (optional): Integer ID of the pod
+    # fex_id: Integer ID of the FEX
+    # sw1: Switch 1 of the vPC (node ID) as an integer
+    # port: Port ID as an integer (i.e. 1 or 2)
+    # encap: Encapsulation VLAN ID as an integer
+    # deploy: lazy | immediate
+    # mdoe: native | regular (dot1p / trunk)
+    # status: created | created,modified | deleted
+    def fex_static_path(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'ap_name': '',
+                         'epg_name': '',
+                         'sw1': '',
+                         'fex_id': '',
+                         'port': '',
+                         'encap': '',
+                         'deploy': '',
+                         'mode': '',
+                         'status': ''}
+        optional_args = {'pod': '1'}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if not int(templateVars['sw1']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['sw1'] = int(templateVars['sw1'])
+        if not int(templateVars['port']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['port'] = int(templateVars['port'])
+        if not int(templateVars['encap']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['encap'] = int(templateVars['encap'])
+        if not int(templateVars['pod']):
+            raise InvalidArg('Pod ID must be an integer')
+        else:
+            templateVars['pod'] = int(templateVars['pod'])
+        if not int(templateVars['fex_id']):
+            raise InvalidArg('FEX ID must be an integer')
+        else:
+            templateVars['fex_id'] = int(templateVars['fex_id'])
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "fex_static_path.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/ap-{}/epg-{}'
+               .format(templateVars['tn_name'], templateVars['ap_name'],
+                       templateVars['epg_name']))
         status = post(self.apic, payload, self.cookies, uri, template_file)
         return status
 

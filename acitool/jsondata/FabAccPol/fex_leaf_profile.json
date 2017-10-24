@@ -1,0 +1,39 @@
+{
+  "infraAccPortP": {
+    "attributes": {
+      "dn": "uni/infra/accportprof-{{name}}"
+    },
+    "children": [
+      {
+        "infraHPortS": {
+          "attributes": {
+            "name": "{{port_name}}",
+            "type": "range",
+            "status": "{{status}}"
+          },
+          "children": [
+            {
+              "infraRsAccBaseGrp": {
+                "attributes": {
+                  "fexId": "{{fex_id}}",
+                  "tDn": "uni/infra/fexprof-{{fex_prof}}/fexbundle-{{fex_pol_grp}}"
+                }
+              }
+            },
+            {
+              "infraPortBlk": {
+                "attributes": {
+                  "fromCard": "{{mod_start}}",
+                  "fromPort": "{{port_start}}",
+                  "name": "block2",
+                  "toCard": "{{mod_end}}",
+                  "toPort": "{{port_end}}"
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
