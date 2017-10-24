@@ -1774,8 +1774,9 @@ class FabTnPol(object):
     # port: Port ID as an integer (i.e. 1 or 2)
     # encap: Encapsulation VLAN ID as an integer
     # deploy: lazy | immediate
+    # mode: native | regular (dot1p, trunk)
     # status: created | created,modified | deleted
-    def static_path_dot1p(self, **kwargs):
+    def static_path(self, **kwargs):
         required_args = {'tn_name': '',
                          'ap_name': '',
                          'epg_name': '',
@@ -1783,6 +1784,7 @@ class FabTnPol(object):
                          'port': '',
                          'encap': '',
                          'deploy': '',
+                         'mode': '',
                          'status': ''}
         optional_args = {'pod': '1'}
 
@@ -1807,7 +1809,7 @@ class FabTnPol(object):
         if templateVars['status'] not in valid_status:
             raise InvalidArg('Status invalid')
 
-        template_file = "static_path_dot1p.json"
+        template_file = "static_path.json"
         template = self.templateEnv.get_template(template_file)
 
         payload = template.render(templateVars)
