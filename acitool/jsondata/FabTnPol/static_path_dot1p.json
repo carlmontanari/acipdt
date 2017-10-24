@@ -5,7 +5,7 @@
       "dn": "uni/tn-{{tn_name}}/ap-{{ap_name}}/epg-{{epg_name}}/rspathAtt-[topology/pod-{{pod}}/paths-{{sw1}}/pathep-[eth1/{{port}}]]",
       "encap": "vlan-{{encap}}",
       "instrImedcy": "{{deploy}}",
-      "mode": "native",
+      "mode": "{{mode}}",
       "primaryEncap": "unknown",
       "status": "{{status}}"
     }
