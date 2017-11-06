@@ -1667,6 +1667,7 @@ class FabTnPol(object):
     # vpc: Name of the vPC
     # encap: Encapsulation VLAN ID as an integer
     # deploy: lazy | immediate
+    # mode; (optional): regular (trunk) | native (dot1p)
     # status: created | created,modified | deleted
     def static_path_vpc(self, **kwargs):
         required_args = {'tn_name': '',
@@ -1678,7 +1679,8 @@ class FabTnPol(object):
                          'encap': '',
                          'deploy': '',
                          'status': ''}
-        optional_args = {'pod': '1'}
+        optional_args = {'pod': '1',
+                         'mode': 'regular'}
 
         templateVars = process_kwargs(required_args, optional_args, **kwargs)
 
