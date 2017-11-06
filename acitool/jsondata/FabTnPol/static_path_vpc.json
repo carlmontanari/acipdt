@@ -13,6 +13,7 @@
                         "tDn": "topology/pod-{{pod}}/protpaths-{{sw1}}-{{sw2}}/pathep-[{{vpc}}]",
                         "encap": "vlan-{{encap}}",
                         "instrImedcy": "{{deploy}}",
+                        "mode": "{{mode}}",
                         "status": "{{status}}"
                     }
                 }
