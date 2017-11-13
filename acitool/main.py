@@ -14,6 +14,13 @@ import os
 # Log levels 0 = None, 1 = Class only, 2 = Line
 log_level = 2
 
+# Define the name of the configuration file you will be using.  This doesn't alter the folder name.
+ACI_DEPLOY_FILE = 'aci_deploy_master-public.xls'
+
+# Adding these values are NOT secure.  Use for testing only.
+APICIP = None
+APICUSER = None
+APICPASS = None
 
 def stdout_log(sheet, line):
     if log_level == 0:
@@ -31,7 +38,7 @@ def stdout_log(sheet, line):
 
 def read_in(usr_path):
     try:
-        wb_path = os.path.join(usr_path, 'ACI Deploy.xls')
+        wb_path = os.path.join(usr_path, ACI_DEPLOY_FILE)
         wb = xlrd.open_workbook(wb_path)
         print("Workbook Loaded.")
     except Exception as e:
@@ -378,34 +385,48 @@ def del_snap_pol(apic, cookies, snapshot_name):
 def main():
     # Disable urllib3 warnings
     requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-    # Ask user for path to 'ACI Deploy.xls'
+    # Ask user for path to the ACI_DEPLOY_FILE
     while True:
-        print('Please enter the path to \'ACI Deploy.xls\', note that this is '
-              'also where the workbook will be saved upon completion.')
+        print('Please enter the path to {0}, note that this is '
+              'also where the workbook will be saved upon completion.'.format(ACI_DEPLOY_FILE))
         usr_path = input('Path: ')
         if os.path.exists(usr_path):
             break
         else:
             print('Enter a valid path.')
+
     # Static snapshot name
     snapshot_name = 'acipdt_backup'
-    # Prompt for APIC IP
-    while True:
-        apic = input('Enter the APIC IP: ')
-        try:
-            ipaddress.ip_address(apic)
-            break
-        except Exception as e:
-            print('Enter a valid IP address. Error received: {}'.format(e))
-    # Prompt for APIC Username
-    user = input('Enter APIC username: ')
-    # Prompt for APIC Password
-    while True:
-        try:
-            pword = getpass.getpass(prompt='Enter APIC password: ')
-            break
-        except Exception as e:
-            print('Something went wrong. Error received: {}'.format(e))
+
+    # Prompt for APIC IP if the constant is None
+    if APICIP is not None:
+        apic = APICIP
+    else:
+        while True:
+            apic = input('Enter the APIC IP: ')
+            try:
+                ipaddress.ip_address(apic)
+                break
+            except Exception as e:
+                print('Enter a valid IP address. Error received: {}'.format(e))
+
+    # Prompt for APIC Username if the constant is None
+    if APICUSER is not None:
+        user = APICUSER
+    else:
+        user = input('Enter APIC username: ')
+
+    # Prompt for APIC Password if the constant is None
+    if APICPASS is not None:
+        pword = APICPASS
+    else:
+        while True:
+            try:
+                pword = getpass.getpass(prompt='Enter APIC password: ')
+                break
+            except Exception as e:
+                print('Something went wrong. Error received: {}'.format(e))
+
     # Initialize the fabric login method, passing appropriate variables
     fablogin = acipdt.FabLogin(apic, user, pword)
     # Run the login and load the cookies var
@@ -423,7 +444,7 @@ def main():
     fab_admin_policies(apic, cookies, wb, wr_wb)
     mpod_policies(apic, cookies, wb, wr_wb)
     # Save workbook to user path
-    wr_wb.save('{}/ACI Deploy.xls'.format(usr_path))
+    wr_wb.save('{0}/{1}'.format(usr_path, ACI_DEPLOY_FILE))
     if snap is not None:
         revert_snapshot(apic, cookies, snapshot_name)
         del_snap_pol(apic, cookies, snapshot_name)
