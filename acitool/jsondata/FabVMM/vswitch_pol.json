@@ -1,7 +1,7 @@
 {
   "vmmVSwitchPolicyCont": {
     "attributes": {
-      "dn": "uni/vmmp-VMware/dom-{{name}}-vCenter/vswitchpolcont",
+      "dn": "uni/vmmp-VMware/dom-{{name}}/vswitchpolcont",
       "status": "{{status}}"
     },
     "children": [

@@ -2555,6 +2555,68 @@ class FabL3Pol(object):
     # Method must be called with the following kwargs.
     # tn_name: Name of the Tenant
     # name: The name of the L3 Out
+    # node_name: Name of the Node Profile
+    # int_profile: Name of the Interface Profile
+    # sw: Integer ID of switch
+    # port: Integer ID of port
+    # peer: BGP Peer address in dotted decimal
+    # local_asn: Local BGP ASN as an integer
+    # remote_asn: Remote BGP ASN as an integer
+    # pod: (Optional) Integer of Pod ID
+    # status: created | created,modified | deleted
+    def bgp_peer_interface(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'name': '',
+                         'node_name': '',
+                         'int_profile': '',
+                         'sw1': '',
+                         'port': '',
+                         'peer': '',
+                         'local_asn': '',
+                         'remote_asn': '',
+                         'status': ''}
+        optional_args = {'pod': '1'}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if not int(templateVars['pod']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['pod'] = int(templateVars['pod'])
+        if not int(templateVars['sw1']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['sw1'] = int(templateVars['sw1'])
+        if not int(templateVars['port']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['port'] = int(templateVars['port'])
+        if not ipaddress.ip_address(templateVars['peer']):
+            raise InvalidArg('Address must be a valid IPv4 address')
+        if not (int(templateVars['local_asn']) in range(1, 65535)):
+            raise InvalidArg('Invalid BGP ASN')
+        else:
+            templateVars['local_asn'] = int(templateVars['local_asn'])
+        if not (int(templateVars['remote_asn']) in range(1, 65535)):
+            raise InvalidArg('Invalid BGP ASN')
+        else:
+            templateVars['remote_asn'] = int(templateVars['remote_asn'])
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "bgp_peer_loopback.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/out-{}'
+               .format(templateVars['tn_name'], templateVars['name']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # tn_name: Name of the Tenant
+    # name: The name of the L3 Out
     # pod: ID of the pod
     # node_name: Name of the Node Profile
     # int_profile: Name of the Interface Profile
@@ -3166,7 +3228,7 @@ class FabVMM(object):
 
         payload = template.render(templateVars)
 
-        uri = ('mo/uni/vmmp-VMware/dom-{}-vCenter'
+        uri = ('mo/uni/vmmp-VMware/dom-{}'
                .format(templateVars['name']))
 
         status = post(self.apic, payload, self.cookies, uri, template_file)

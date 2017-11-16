@@ -1,0 +1,45 @@
+{
+  "bgpPeerP": {
+    "attributes": {
+      "addr": "{{peer}}",
+      "allowedSelfAsCnt": "3",
+      "ctrl": "",
+      "descr": "",
+      "dn": "uni/tn-{{tn_name}}/out-{{name}}/lnodep-{{node_name}}/lifp-{{int_profile}}/rspathL3OutAtt-[topology/pod-{{pod}}/paths-{{sw}}/pathep-[eth1/{{port}}]]/peerP-[{{peer}}]",
+      "name": "",
+      "peerCtrl": "",
+      "privateASctrl": "",
+      "ttl": "1",
+      "weight": "0",
+      "status": "{{status}}"
+    },
+    "children": [
+      {
+        "bgpRsPeerPfxPol": {
+          "attributes": {
+            "tnBgpPeerPfxPolName": ""
+          }
+        }
+      },
+      {
+        "bgpLocalAsnP": {
+          "attributes": {
+            "asnPropagate": "none",
+            "descr": "",
+            "localAsn": "{{local_asn}}",
+            "name": ""
+          }
+        }
+      },
+      {
+        "bgpAsP": {
+          "attributes": {
+            "asn": "{{remote_asn}}",
+            "descr": "",
+            "name": ""
+          }
+        }
+      }
+    ]
+  }
+}
