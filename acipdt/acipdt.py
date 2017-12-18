@@ -46,7 +46,6 @@ def process_kwargs(required_args, optional_args, **kwargs):
 def post(apic, payload, cookies, uri, section):
     s = requests.Session()
     r = ''
-    print(payload)
     while r == '':
         try:
             r = s.post('https://{}/api/node/{}.json'.format(apic, uri),
@@ -60,7 +59,6 @@ def post(apic, payload, cookies, uri, section):
             print("Method {} failed. Exception: {}".format(section[:-5], e))
             status = 666
             return(status)
-        print(r.text)
     return status
 
 
