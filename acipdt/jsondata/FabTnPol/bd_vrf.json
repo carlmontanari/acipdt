@@ -1,0 +1,8 @@
+{
+  "fvRsCtx": {
+    "attributes": {
+      "tnFvCtxName": "{{vrf}}",
+      "status": "created,modified"
+    }
+  }
+}

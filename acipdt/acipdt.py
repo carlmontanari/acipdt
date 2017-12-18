@@ -1297,6 +1297,34 @@ class FabTnPol(object):
     # Method must be called with the following kwargs.
     # tn_name: The name of the Tenant
     # name: Name of the BD
+    # vrf: Name of associated VRF
+    # status: created | created,modified | deleted
+    def bd_vrf(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'name': '',
+                         'vrf': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "bd_vrf.json"
+
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/BD-{}/rsctx'
+               .format(templateVars['tn_name'], templateVars['name']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # tn_name: The name of the Tenant
+    # name: Name of the BD
     # subnet: Subnet in CIDR: ex: 1.1.1.1/24
     # preferred: yes | no
     # scope: public | private | shared | public,shared | private,shared
