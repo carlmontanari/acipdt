@@ -1,4 +1,4 @@
-from acitool import acipdt
+import acipdt
 import xlrd
 import xlwt
 import requests
@@ -14,13 +14,15 @@ import os
 # Log levels 0 = None, 1 = Class only, 2 = Line
 log_level = 2
 
-# Define the name of the configuration file you will be using.  This doesn't alter the folder name.
-ACI_DEPLOY_FILE = 'aci_deploy_master-public.xls'
+# Define the name of the configuration file you will be using.
+# This doesn't alter the folder name.
+ACI_DEPLOY_FILE = 'aci_deploy.xls'
 
 # Adding these values are NOT secure.  Use for testing only.
 APICIP = None
 APICUSER = None
 APICPASS = None
+
 
 def stdout_log(sheet, line):
     if log_level == 0:

@@ -8,7 +8,7 @@ import pkg_resources
 import time
 
 # Global path to main json directory
-json_path = pkg_resources.resource_filename('acitool', 'jsondata/')
+json_path = pkg_resources.resource_filename('acipdt', 'jsondata/')
 
 # Global list of allowed statuses
 valid_status = ['created', 'created,modified', 'deleted']
@@ -2237,7 +2237,7 @@ class FabL3Pol(object):
     # port: Port number as an integer
     # vlan: VLAN ID as an integer
     # ip: IP of the interface in dotted decimal format (i.e. 1.1.1.1)
-    # int_profile_status created | created,modified | deleted of the Interface Profile
+    # int_profile_status created | created,modified | deleted of Int Profile
     # status: created | created,modified | deleted of the Interface itself
     def routed_sub_ints(self, **kwargs):
         required_args = {'tn_name': '',
@@ -2250,6 +2250,7 @@ class FabL3Pol(object):
                          'vlan': '',
                          'ip': '',
                          'int_profile': '',
+                         'int_profile_status': '',
                          'status': ''}
         optional_args = {}
 
