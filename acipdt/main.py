@@ -5,7 +5,6 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from xlutils.copy import copy
 from orderedset import OrderedSet
-import collections
 import sys
 import time
 import ipaddress
@@ -20,9 +19,9 @@ log_level = 2
 ACI_DEPLOY_FILE = 'aci_deploy.xls'
 
 # Adding these values are NOT secure.  Use for testing only.
-APICIP = '10.10.10.20'
-APICUSER = 'admin'
-APICPASS = 'password'
+APICIP = None
+APICUSER = None
+APICPASS = None
 
 
 def stdout_log(sheet, line):
