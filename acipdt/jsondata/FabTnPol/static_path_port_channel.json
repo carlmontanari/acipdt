@@ -1,0 +1,10 @@
+{
+    "fvRsPathAtt": {
+        "attributes": {
+            "encap": "vlan-{{encap}}",
+            "instrImedcy": "{{deploy}}",
+            "mode": "regular",
+            "status": "{{status}}"
+        }
+    }
+}

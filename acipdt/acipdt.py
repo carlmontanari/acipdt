@@ -1748,6 +1748,58 @@ class FabTnPol(object):
     # epg_name: Name of the EPG
     # pod (optional): Integer ID of the pod
     # sw1: Switch 1 of the vPC (node ID) as an integer
+    # port_channel: Name of the Port Channel
+    # encap: Encapsulation VLAN ID as an integer
+    # deploy: lazy | immediate
+    # mode; (optional): regular (trunk) | native (dot1p)
+    # status: created | created,modified | deleted
+    def static_path_port_channel(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'ap_name': '',
+                         'epg_name': '',
+                         'sw1': '',
+                         'port_channel': '',
+                         'encap': '',
+                         'deploy': '',
+                         'status': ''}
+        optional_args = {'pod': '1',
+                         'mode': 'regular'}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if not int(templateVars['sw1']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['sw1'] = int(templateVars['sw1'])
+        if not int(templateVars['encap']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['encap'] = int(templateVars['encap'])
+        if not int(templateVars['pod']):
+            raise InvalidArg('Pod ID must be an integer')
+        else:
+            templateVars['pod'] = int(templateVars['pod'])
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "static_path_port_channel.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/ap-{}/epg-{}//rspathAtt-[topology/pod-{}/paths-{}/pathep-[{}]]'
+               .format(templateVars['tn_name'], templateVars['ap_name'],
+                       templateVars['epg_name'], templateVars['pod'],
+                       templateVars['sw1'], templateVars['port_channel']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # tn_name: The name of the Tenant
+    # ap_name: Name of parent Application Profile
+    # epg_name: Name of the EPG
+    # pod (optional): Integer ID of the pod
+    # sw1: Switch 1 of the vPC (node ID) as an integer
     # port: Port ID as an integer (i.e. 1 or 2)
     # encap: Encapsulation VLAN ID as an integer
     # deploy: lazy | immediate
