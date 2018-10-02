@@ -1,0 +1,17 @@
+{
+    "fvCtx": {
+        "attributes": {
+            "dn": "uni/tn-{{tn_name}}/ctx-{{vrf}}",
+            "name": "{{vrf}}"
+        },
+        "children": [
+            {
+                "pimCtxP": {
+                    "attributes": {
+                        "status": "{{status}}"
+                    }
+                }
+            }
+       ]
+    }
+}

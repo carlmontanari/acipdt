@@ -13,18 +13,8 @@
             "unicastRoute": "{{unicast}}",
             "unkMacUcastAct": "{{unk_unicast}}",
             "unkMcastAct": "{{mcast}}",
+            "mcastAllow": "{{multicast}}",
             "status": "{{status}}"
-        },
-        "children": [
-            {
-                "fvRsCtx": {
-                    "attributes": {
-                        "rn": "rsctx",
-                        "status": "{{status}}",
-                        "tnFvCtxName": "{{vrf}}"
-                    }
-                }
-            }
-        ]
+        }
     }
 }

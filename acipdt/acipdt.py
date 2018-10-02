@@ -10,7 +10,7 @@ import time
 # Global options for debugging
 PRINT_PAYLOAD = False
 PRINT_RESPONSE_TEXT_ALWAYS = False
-PRINT_RESPONSE_TEXT_ON_FAIL = False
+PRINT_RESPONSE_TEXT_ON_FAIL = True
 
 # Global path to main json directory
 json_path = pkg_resources.resource_filename('acipdt', 'jsondata/')
@@ -1401,8 +1401,10 @@ class FabTnPol(object):
     # mcast: flood | opt-flood
     # unicast: yes | no
     # unk_unicast: proxy | flood
-    # vrf: Name of associated VRF
+    # vrf: Name of associated VRF -- moving to OPTIONAL to not break older,
+    #           versions, but has no functionality at this point
     # status: created | created,modified | deleted
+    # multicast (Optional): yes | no -- multicast routing tick box
     def bd(self, **kwargs):
         required_args = {'tn_name': '',
                          'name': '',
@@ -1411,9 +1413,10 @@ class FabTnPol(object):
                          'mcast': '',
                          'unicast': '',
                          'unk_unicast': '',
-                         'vrf': '',
                          'status': ''}
-        optional_args = {'limitlearn': 'yes'}
+        optional_args = {'limitlearn': 'yes',
+                         'multicast': 'no',
+                         'vrf': ''}
 
         templateVars = process_kwargs(required_args, optional_args, **kwargs)
 
@@ -3009,6 +3012,81 @@ class FabL3Pol(object):
         uri = ('mo/uni/tn-{}/out-{}/instP-{}'
                .format(templateVars['tn_name'], templateVars['name'],
                        templateVars['epg_name']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # tn_name: Name of the Tenant
+    # name: The name of the L3 Out
+    # vrf: Name of the VRF
+    # status: created | created,modified | deleted
+    def vrf_enable_pim(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'vrf': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "vrf_enable_pim.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/ctx-{}'
+               .format(templateVars['tn_name'], templateVars['vrf']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # tn_name: Name of the Tenant
+    # name: The name of the L3 Out
+    # vrf: Name of the VRF
+    # rp: IP of RP
+    # status: created | created,modified | deleted
+    def vrf_pim_static_rp(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'vrf': '',
+                         'rp': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "vrf_pim_static_rp.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+        uri = ('mo/uni/tn-{}/ctx-{}/pimctxp/staticrp/staticrpent-[{}]'
+               .format(templateVars['tn_name'], templateVars['vrf'],
+                       templateVars['rp']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # tn_name: Name of the Tenant
+    # l3_out: Name of the L3 Out
+    # status: created | created,modified | deleted
+    def l3_out_pim(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'l3_out': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "l3_out_pim.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+        uri = ('mo/uni/tn-{}/out-{}/'
+               .format(templateVars['tn_name'], templateVars['l3_out']))
         status = post(self.apic, payload, self.cookies, uri, template_file)
         return status
 

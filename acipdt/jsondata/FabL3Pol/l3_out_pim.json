@@ -1,0 +1,16 @@
+{
+    "l3extOut": {
+        "attributes": {
+            "name": "{{l3_out}}"
+        },
+        "children": [
+            {
+                "pimExtP": {
+                    "attributes": {
+                        "status": "{{status}}"
+                    }
+                }
+            }
+        ]
+    }
+}

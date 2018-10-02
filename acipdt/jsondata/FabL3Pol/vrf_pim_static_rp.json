@@ -1,0 +1,8 @@
+{
+    "pimStaticRPEntryPol": {
+        "attributes": {
+            "rpIp": "{{rp}}",
+            "status": "{{status}}"
+        }
+    }
+}
