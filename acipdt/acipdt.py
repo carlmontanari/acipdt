@@ -7,6 +7,11 @@ import ipaddress
 import pkg_resources
 import time
 
+# Global options for debugging
+PRINT_PAYLOAD = False
+PRINT_RESPONSE_TEXT_ALWAYS = False
+PRINT_RESPONSE_TEXT_ON_FAIL = False
+
 # Global path to main json directory
 json_path = pkg_resources.resource_filename('acipdt', 'jsondata/')
 
@@ -44,6 +49,8 @@ def process_kwargs(required_args, optional_args, **kwargs):
 
 # Function to execute HTTP Post
 def post(apic, payload, cookies, uri, section):
+    if PRINT_PAYLOAD:
+        print(payload)
     s = requests.Session()
     r = ''
     while r == '':
@@ -59,6 +66,10 @@ def post(apic, payload, cookies, uri, section):
             print("Method {} failed. Exception: {}".format(section[:-5], e))
             status = 666
             return(status)
+    if PRINT_RESPONSE_TEXT_ALWAYS:
+        print(r.text)
+    if status != 200 and PRINT_RESPONSE_TEXT_ON_FAIL:
+        print(r.text)
     return status
 
 
@@ -882,6 +893,31 @@ class FabAccPol(object):
         return status
 
     # Method must be called with the following kwargs.
+    # name: Name of the Interface Policy Group
+    # status: created | created,modified | deleted
+    # breakout_map: 10g-4x | 25g-4x
+    def int_pol_grp_brkout(self, **kwargs):
+        required_args = {'name': '',
+                         'status': '',
+                         'breakout_map': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "int_pol_grp_brkout.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/infra/funcprof/brkoutportgrp-{}'
+               .format(templateVars['name']))
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
     # name: Name of the Interface Profile
     # status: created | created,modified | deleted
     def int_profile(self, **kwargs):
@@ -907,9 +943,10 @@ class FabAccPol(object):
     # name: Name of the Interface Selector
     # status: created | created,modified | deleted
     # port_name: Name of the port selector in the Interface Profile
-    # port_type: accportgrp | accbundle
+    # port_type: accportgrp | accbundle | brkoutportgrp
     #   Note: accportgrp = Access Port
     #   Note: accbundle = vPC or Port Channel
+    #   Note: brkoutportgrp = Breakout Ports
     # pol_group: Name of the Policy Group to apply
     # mod_start: Starting mod as an integer (almost always 1)
     # mod_end: Ending mod as an integer (almost always 1)
@@ -949,6 +986,106 @@ class FabAccPol(object):
             raise InvalidArg('Status invalid')
 
         template_file = "int_selector.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = 'mo/uni/infra/accportprof-{}'.format(templateVars['name'])
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # name: Name of the Interface Selector
+    # status: created | created,modified | deleted
+    # port_name: Name of the port selector in the Interface Profile
+    # pol_group: Name of the Policy Group to apply
+    # mod_start: Starting mod as an integer (almost always 1)
+    # mod_end: Ending mod as an integer (almost always 1)
+    # port_start: Starting port as an integer
+    # port_end: Ending port as an integer
+    # sub_start: Starting sub port as an integer
+    # sub_end: Ending sub port as an integer
+    def int_sub_selector(self, **kwargs):
+        required_args = {'name': '',
+                         'status': '',
+                         'port_name': '',
+                         'port': '',
+                         'sub_start': '',
+                         'sub_end': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if not int(templateVars['port']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['port'] = int(templateVars['port'])
+        if not int(templateVars['sub_start']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['sub_start'] = int(templateVars['sub_start'])
+        if not int(templateVars['sub_end']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['sub_end'] = int(templateVars['sub_end'])
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "int_sub_selector.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = 'mo/uni/infra/accportprof-{}'.format(templateVars['name'])
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # name: Name of the Interface Selector
+    # status: created | created,modified | deleted
+    # port_name: Name of the port selector in the Interface Profile
+    # port_type: accportgrp | accbundle | brkoutportgrp
+    #   Note: accportgrp = Access Port
+    #   Note: accbundle = vPC or Port Channel
+    #   Note: brkoutportgrp = Breakout Ports
+    # pol_group: Name of the Policy Group to apply
+    # mod (Optional): Mod as an integer (almost always 1)
+    # Port: Part as an integer
+    # sub_start: Starting sub port as an integer
+    # sub_end: Ending sub port as an integer
+    def int_sub_selector_individual(self, **kwargs):
+        required_args = {'name': '',
+                         'status': '',
+                         'port_name': '',
+                         'port_type': '',
+                         'pol_group': '',
+                         'port': '',
+                         'sub_start': '',
+                         'sub_end': ''}
+        optional_args = {'mod': '1'}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if not int(templateVars['mod']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['mod'] = int(templateVars['mod'])
+        if not int(templateVars['port']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['port'] = int(templateVars['port'])
+        if not int(templateVars['sub_start']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['sub_start'] = int(templateVars['sub_start'])
+        if not int(templateVars['sub_end']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['sub_end'] = int(templateVars['sub_end'])
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "int_sub_selector_individual.json"
         template = self.templateEnv.get_template(template_file)
 
         payload = template.render(templateVars)

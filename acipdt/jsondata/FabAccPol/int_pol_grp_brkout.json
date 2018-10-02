@@ -1,0 +1,10 @@
+{
+    "infraBrkoutPortGrp": {
+        "attributes": {
+            "brkoutMap": "10g-4x",
+            "dn": "uni/infra/funcprof/brkoutportgrp-{{name}}",
+            "name": "{{name}}",
+            "status": "{{status}}"
+        }
+    }
+}
