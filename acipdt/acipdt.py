@@ -28,6 +28,10 @@ class InvalidArg(Exception):
     pass
 
 
+class LoginFailed(Exception):
+    pass
+
+
 # Function to validate input for each method
 def process_kwargs(required_args, optional_args, **kwargs):
     # Validate all required kwargs passed
@@ -48,7 +52,7 @@ def process_kwargs(required_args, optional_args, **kwargs):
 
 
 # Function to execute HTTP Post
-def post(apic, payload, cookies, uri, section):
+def post(apic, payload, cookies, uri, section=''):
     if PRINT_PAYLOAD:
         print(payload)
     s = requests.Session()
@@ -126,7 +130,8 @@ class FabLogin(object):
         except Exception as e:
             print("Something went wrong logging into the APIC - ABORT!")
             # Log exit reason somewhere
-            sys.exit(e)
+            raise LoginFailed(e)
+        self.cookies = cookies
         return cookies
 
 
@@ -3184,11 +3189,11 @@ class Query(object):
     # Method must be called with the following kwargs.
     # dn: DN of object you would like to query
     # Returns status code and json payload of query
-    def query_dn(self, dn):
+    def query_dn(self, dn, query_filter=''):
         s = requests.Session()
         try:
-            r = s.get('https://{}/api/node/mo/{}.json'.format(self.apic, dn),
-                      cookies=self.cookies, verify=False)
+            r = s.get('https://{}/api/node/mo/{}.json{}'.format(self.apic, dn,
+                      query_filter), cookies=self.cookies, verify=False)
             status = r.status_code
             payload = json.loads(r.text)
         except Exception as e:
@@ -3196,11 +3201,12 @@ class Query(object):
             status = 666
         return (status, payload)
 
-    def query_class(self, query_class):
+    def query_class(self, query_class, query_filter=''):
         s = requests.Session()
         try:
-            r = s.get('https://{}/api/node/class/{}.json'.format(self.apic,
-                      query_class), cookies=self.cookies, verify=False)
+            r = s.get('https://{}/api/node/class/{}.json{}'.format(self.apic,
+                      query_class, query_filter), cookies=self.cookies,
+                      verify=False)
             status = r.status_code
             payload = json.loads(r.text)
         except Exception as e:
